@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap');
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    /* Business (default) */
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --primary-light: #dbeafe;
+    --primary-soft: rgba(37,99,235,0.08);
+    --accent: #f59e0b;
+    --accent-light: #fef3c7;
+    --bg-header: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    --bg-body: #f0f4f8;
+    --bg-card: #ffffff;
+    --bg-input: #f8fafc;
+    --text: #1e293b;
+    --text-dim: #64748b;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  
+  .theme-private {
+    --primary: #059669;
+    --primary-dark: #047857;
+    --primary-light: #d1fae5;
+    --primary-soft: rgba(5,150,105,0.08);
+    --accent: #f59e0b;
+    --accent-light: #fef3c7;
+    --bg-header: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    --bg-body: #f0fdf4;
+    --bg-card: #ffffff;
+    --bg-input: #f0fdf4;
+    --text: #1e293b;
+    --text-dim: #64748b;
+    --text-muted: #94a3b8;
+    --border: #d1fae5;
+  }
+  
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg-body);
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1.7;
+    transition: background 0.4s ease;
+  }
+  
+  /* ── Header ── */
+  .header {
+    background: var(--bg-header);
+    color: white;
+    padding: 20px 16px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    transition: background 0.4s ease;
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .header h1 .accent { color: var(--accent); }
+  .header .subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 3px;
+    font-weight: 400;
+  }
+  
+  /* ── Steps ── */
+  .steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  .step-item.active { color: var(--primary); font-weight: 600; }
+  .step-item.done { color: #22c55e; }
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    border: 2px solid var(--border);
+    color: var(--text-muted);
+    transition: all 0.3s;
+  }
+  .step-item.active .step-num {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+  }
+  .step-item.done .step-num {
+    border-color: #22c55e;
+    background: #22c55e;
+    color: white;
+  }
+  .step-arrow { color: var(--border); font-size: 12px; }
+  
+  /* ── Content ── */
+  .content { padding: 18px 16px; }
+  
+  /* ── Type Toggle ── */
+  .type-toggle {
+    display: flex;
+    gap: 0;
+    margin-bottom: 18px;
+    background: var(--border);
+    border-radius: 14px;
+    padding: 3px;
+    position: relative;
+  }
+  .type-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    cursor: pointer;
+    text-align: center;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text-dim);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+  .type-btn.active {
+    background: var(--bg-card);
+    color: var(--text);
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+  }
+  .type-btn .emoji { font-size: 22px; display: block; margin-bottom: 3px; }
+  
+  /* ── Input Section ── */
+  .input-section { text-align: center; padding: 8px 0; }
+  .hero-icon {
+    font-size: 53px;
+    margin-bottom: 10px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .input-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .input-section p {
+    color: var(--text-dim);
+    font-size: 16px;
+    margin-bottom: 18px;
+    line-height: 1.8;
+  }
+  
+  .task-input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .task-input {
+    width: 100%;
+    padding: 14px 14px 14px 42px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    font-size: 18px;
+    font-family: inherit;
+    outline: none;
+    background: var(--bg-card);
+    transition: all 0.2s;
+    color: var(--text);
+  }
+  .task-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .task-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 19px;
+  }
+  
+  /* ── Sample Tags ── */
+  .sample-section { margin-top: 16px; text-align: left; }
+  .sample-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sample-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .sample-tag {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 7px 13px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    color: var(--text-dim);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .sample-tag:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-soft);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+  .sample-tag:active { transform: translateY(0); }
+  
+  /* ── Chat ── */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 150px);
+  }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 10px;
+  }
+  .msg {
+    margin-bottom: 12px;
+    display: flex;
+    animation: msgIn 0.3s ease-out;
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg.user { justify-content: flex-end; }
+  .msg.assistant { justify-content: flex-start; }
+  .msg-bubble {
+    max-width: 88%;
+    padding: 12px 14px;
+    border-radius: 16px;
+    font-size: 17px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .msg.user .msg-bubble {
+    background: var(--primary);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.assistant .msg-bubble {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+    box-shadow: var(--shadow);
+  }
+  .msg-task-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+  
+  .chat-input-area {
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .chat-input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 17px;
+    font-family: inherit;
+    outline: none;
+    background: var(--bg-card);
+    color: var(--text);
+    transition: border 0.2s;
+  }
+  .chat-input:focus { border-color: var(--primary); }
+  
+  .skip-btn {
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .skip-btn:hover { border-color: var(--primary); color: var(--primary); }
+  
+  /* ── Goal Badge ── */
+  .goal-badge {
+    background: var(--primary-light);
+    border: 2px solid var(--primary);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .goal-badge::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, var(--primary-soft) 0%, transparent 70%);
+    animation: pulse-bg 4s ease-in-out infinite;
+  }
+  @keyframes pulse-bg {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+  }
+  .goal-badge > * { position: relative; z-index: 1; }
+  .goal-badge .label {
+    font-size: 13px;
+    color: var(--primary-dark);
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .goal-badge .goal-text {
+    font-size: 19px;
+    font-weight: 700;
+    margin-top: 6px;
+    color: var(--text);
+  }
+  .goal-badge .goal-level {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  
+  /* ── Forms ── */
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 17px;
+    font-family: inherit;
+    outline: none;
+    background: var(--bg-card);
+    color: var(--text);
+    transition: border 0.2s;
+  }
+  .form-input:focus { border-color: var(--primary); }
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-group { flex: 1; }
+  
+  /* ── Buttons ── */
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
+  }
+  .btn-primary:active::after { width: 300px; height: 300px; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(37,99,235,0.35); }
+  .btn-primary:disabled { background: #cbd5e1; cursor: default; box-shadow: none; transform: none; }
+  
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-card);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+  .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+  
+  .send-btn {
+    padding: 12px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 17px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .send-btn:hover { background: var(--primary-dark); }
+  .send-btn:disabled { background: #cbd5e1; }
+  
+  /* ── Loading ── */
+  .loading-dots { display: flex; gap: 5px; padding: 6px 0; }
+  .loading-dots span {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-5px); }
+  }
+  
+  /* ── Result ── */
+  .result-card {
+    background: var(--bg-card);
+    border: 2px solid var(--primary-light);
+    border-radius: 16px;
+    padding: 24px 18px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+  }
+  .result-icon {
+    font-size: 58px;
+    margin-bottom: 10px;
+    animation: pop 0.5s ease-out;
+  }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  .result-card h3 {
+    font-size: 20px;
+    margin-bottom: 14px;
+    font-weight: 700;
+  }
+  .result-card .detail {
+    font-size: 16px;
+    color: var(--text-dim);
+    white-space: pre-wrap;
+    text-align: left;
+    background: var(--bg-input);
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    line-height: 1.8;
+    border: 1px solid var(--border);
+  }
+  
+  /* ── Tooltip ── */
+  .feature-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: var(--accent-light);
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #92400e;
+    line-height: 1.6;
+    animation: fadeIn 0.5s ease;
+  }
+  .feature-hint .hint-icon { font-size: 19px; flex-shrink: 0; margin-top: 1px; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+  .hidden { display: none; }
+  
+  /* ── Phase Selection ── */
+  .phase-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .phase-icon { font-size: 20px; }
+  .phase-list { display: flex; flex-direction: column; gap: 8px; }
+  .phase-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .phase-item:has(input:checked) {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .phase-item input[type="checkbox"] {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    flex-shrink: 0;
+  }
+  .phase-info { display: flex; flex-direction: column; gap: 2px; }
+  .phase-name { font-size: 16px; font-weight: 600; color: var(--text); }
+  .phase-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header" id="mainHeader">
+  <h1>🧭 逆算<span class="accent">AI</span></h1>
+  <div class="subtitle" id="headerSubtitle">あなた専属のAI参謀</div>
+</div>
+
+<!-- Steps -->
+<div class="steps" id="stepsBar">
+  <div class="step-item active" id="si0"><div class="step-num">1</div><span>入力</span></div>
+  <div class="step-arrow">›</div>
+  <div class="step-item" id="si1"><div class="step-num">2</div><span>対話</span></div>
+  <div class="step-arrow">›</div>
+  <div class="step-item" id="si2"><div class="step-num">3</div><span>日程</span></div>
+  <div class="step-arrow">›</div>
+  <div class="step-item" id="si3"><div class="step-num">4</div><span>完了</span></div>
+</div>
+
+<!-- Step 0: Input -->
+<div class="content" id="step0">
+  <div class="input-section">
+    <div class="hero-icon" id="heroIcon">🧭</div>
+    <h2>やるべきタスクを入力</h2>
+    <p>AIがあなたの「本当のゴール」を一緒に見つけて<br>逆算スケジュールを自動生成します</p>
+    
+    <div class="type-toggle">
+      <button class="type-btn active" id="typeBiz" onclick="setType(false)">
+        <span class="emoji">💼</span>ビジネス
+      </button>
+      <button class="type-btn" id="typePrivate" onclick="setType(true)">
+        <span class="emoji">🌿</span>プライベート
+      </button>
+    </div>
+    
+    <div class="task-input-wrap">
+      <span class="task-input-icon" id="inputIcon">💼</span>
+      <input type="text" class="task-input" id="taskInput" placeholder="例：新サービスの事業計画書を作成する" onkeydown="if(event.key==='Enter')startHearing()">
+    </div>
+    
+    <button class="btn-primary" onclick="startHearing()" id="startBtn">AIヒアリング開始 →</button>
+    
+    <div class="sample-section">
+      <div class="sample-label">💡 タップしてすぐ試せます</div>
+      <div class="sample-tags" id="sampleTags"></div>
+    </div>
+    
+    <div class="feature-hint">
+      <span class="hint-icon">✨</span>
+      <span id="hintText">AIが「その仕事、本当のゴールは何ですか？」を引き出します。抽象度を4段階で可視化し、今回のゴールレベルを選べます。</span>
+    </div>
+  </div>
+</div>
+
+<!-- Step 1: Hearing -->
+<div class="content hidden" id="step1">
+  <div class="chat-container">
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="回答を入力..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="send-btn" onclick="sendMessage()" id="sendBtn">送信</button>
+      </div>
+      <button class="skip-btn" onclick="skipToDate()">⏭ スキップして日程設定へ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Step 2: Date Input -->
+<div class="content hidden" id="step2">
+  <div style="text-align:center; font-size:43px; margin-bottom:10px;">🎯</div>
+  <h2 style="text-align:center; font-size:20px; margin-bottom:14px; font-weight:700;">ゴールが確定しました</h2>
+  
+  <div class="goal-badge">
+    <div class="label">GOAL</div>
+    <div class="goal-text" id="goalDisplay"></div>
+    <div class="goal-level" id="goalLevelDisplay"></div>
+  </div>
+  
+  <!-- Phase Selection (business plan tasks only) -->
+  <div id="phaseSelection" class="hidden">
+    <div class="phase-header">
+      <span class="phase-icon">📋</span>
+      <span>スケジュールに含めるフェーズを選択</span>
+    </div>
+    <div class="phase-list">
+      <label class="phase-item">
+        <input type="checkbox" id="ph1" checked>
+        <div class="phase-info">
+          <span class="phase-name">原点整理</span>
+          <span class="phase-desc">原体験・強みの棚卸し、使命と目指す未来の言語化</span>
+        </div>
+      </label>
+      <label class="phase-item">
+        <input type="checkbox" id="ph2" checked>
+        <div class="phase-info">
+          <span class="phase-name">コンセプト設計</span>
+          <span class="phase-desc">ターゲット顧客、提供価値、ニッチ戦略、PR設計</span>
+        </div>
+      </label>
+      <label class="phase-item">
+        <input type="checkbox" id="ph3" checked>
+        <div class="phase-info">
+          <span class="phase-name">強みのポジショニング</span>
+          <span class="phase-desc">5つの勝負軸から圧倒的に勝つ領域と差別化ポイントを特定</span>
+        </div>
+      </label>
+      <label class="phase-item">
+        <input type="checkbox" id="ph4">
+        <div class="phase-info">
+          <span class="phase-name">ブランド設計</span>
+          <span class="phase-desc">顧客に届けたい感情・変化・見られ方の言語化、世界観KW策定、ビジュアル方針</span>
+        </div>
+      </label>
+      <label class="phase-item">
+        <input type="checkbox" id="ph5" checked>
+        <div class="phase-info">
+          <span class="phase-name">検証・実行</span>
+          <span class="phase-desc">モニター獲得、フィードバック収集、ピボット判断</span>
+        </div>
+      </label>
+      <label class="phase-item">
+        <input type="checkbox" id="ph6">
+        <div class="phase-info">
+          <span class="phase-name">認知拡大・SNS戦略</span>
+          <span class="phase-desc">認知チャネル設計、SNS発信計画（実績1:情報2:多面性3）</span>
+        </div>
+      </label>
+    </div>
+    <div class="feature-hint" style="margin-top:10px; margin-bottom:14px;">
+      <span class="hint-icon">💡</span>
+      <span>チェックを外したフェーズはスケジュールに含まれません。<br>まず必須の3つ（原点・コンセプト・検証）から始めて、後から追加もOKです。</span>
+    </div>
+  </div>
+  
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">📅 ゴール日</label>
+      <input type="date" class="form-input" id="goalDate">
+    </div>
+    <div class="form-group">
+      <label class="form-label">🕐 時間</label>
+      <input type="time" class="form-input" id="goalTime" value="10:00">
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <label class="form-label">📝 ゴールタイトル（編集可）</label>
+    <input type="text" class="form-input" id="goalTitle">
+  </div>
+  
+  <button class="btn-primary" onclick="generateSchedule()" id="genBtn">逆算スケジュールを生成 →</button>
+</div>
+
+<!-- Step 3: Result -->
+<div class="content hidden" id="step3">
+  <div class="result-card">
+    <div class="result-icon">✅</div>
+    <h3>スケジュール生成完了！</h3>
+    <div class="detail" id="resultDetail"></div>
+    <button class="btn-primary" onclick="exportCal()">📅 Googleカレンダーに書き出す</button>
+    <button class="btn-secondary" onclick="resetAll()">🔄 新しいタスクで始める</button>
+  </div>
+</div>
+
+<script>
+// ── State ──
+var currentStep = 0;
+var taskInput = '';
+var isPrivate = false;
+var chatHistory = [];
+var trueGoal = '';
+var goalLevel = '2';
+var bizType = '';
+var dominateAxis = '';
+var differAxis = '';
+var isLoading = false;
+
+// ── Sample Data ──
+var bizSamples = [
+  { text: '新サービスの事業計画書を作成する', emoji: '📋' },
+  { text: '新規採用を進める', emoji: '👤' },
+  { text: '社内研修を企画する', emoji: '🎓' },
+  { text: '新サービスをリリースする', emoji: '🚀' },
+  { text: '取引先へのプレゼン資料を作る', emoji: '📊' },
+  { text: '業務改善の提案書を書く', emoji: '📝' },
+  { text: 'M&Aの検討を進める', emoji: '🤝' },
+  { text: '企業への投資判断を行う', emoji: '💰' },
+];
+var privateSamples = [
+  { text: '旅行の計画を立てる', emoji: '✈️' },
+  { text: '結婚記念日のお祝いを企画する', emoji: '💍' },
+  { text: '引っ越しの準備をする', emoji: '📦' },
+  { text: '資格試験の勉強を始める', emoji: '📚' },
+  { text: '子どもの誕生日パーティーを計画する', emoji: '🎂' },
+  { text: '年末の大掃除をする', emoji: '🧹' },
+  { text: '家族旅行を計画する', emoji: '🏖️' },
+  { text: '転職活動を始める', emoji: '💼' },
+];
+
+// ── Render Samples ──
+function renderSamples() {
+  var samples = isPrivate ? privateSamples : bizSamples;
+  var container = document.getElementById('sampleTags');
+  container.innerHTML = '';
+  samples.forEach(function(s) {
+    var btn = document.createElement('button');
+    btn.className = 'sample-tag';
+    btn.textContent = s.emoji + ' ' + s.text;
+    btn.onclick = function() { 
+      document.getElementById('taskInput').value = s.text;
+      document.getElementById('taskInput').focus();
+    };
+    container.appendChild(btn);
+  });
+}
+
+// ── Step Management ──
+function goToStep(n) {
+  for (var i = 0; i <= 3; i++) {
+    document.getElementById('step' + i).classList.toggle('hidden', i !== n);
+    var si = document.getElementById('si' + i);
+    si.classList.remove('active', 'done');
+    if (i < n) si.classList.add('done');
+    if (i === n) si.classList.add('active');
+  }
+  currentStep = n;
+}
+
+// ── Type Toggle ──
+function setType(priv) {
+  isPrivate = priv;
+  document.getElementById('typeBiz').classList.toggle('active', !priv);
+  document.getElementById('typePrivate').classList.toggle('active', priv);
+  document.body.classList.toggle('theme-private', priv);
+  
+  // Switch icon & hints
+  document.getElementById('heroIcon').textContent = priv ? '🌿' : '🧭';
+  document.getElementById('inputIcon').textContent = priv ? '🌿' : '💼';
+  document.getElementById('taskInput').placeholder = priv 
+    ? '例：結婚記念日のお祝いを企画する' 
+    : '例：新サービスの事業計画書を作成する';
+  document.getElementById('headerSubtitle').textContent = priv
+    ? 'あなた専属のAIプランナー'
+    : 'あなた専属のAI参謀';
+  document.getElementById('hintText').textContent = priv
+    ? 'プライベートの予定も、AIが「本当に大切にしたいこと」を引き出してスケジュールを逆算します。旅行、記念日、大掃除、何でもOK！'
+    : 'AIが「その仕事、本当のゴールは何ですか？」を引き出します。抽象度を4段階で可視化し、今回のゴールレベルを選べます。';
+  
+  renderSamples();
+}
+
+// ── Step 0 → 1: Start Hearing ──
+function startHearing() {
+  taskInput = document.getElementById('taskInput').value.trim();
+  if (!taskInput) return;
+  
+  goToStep(1);
+  addChatMessage('user', taskInput, true);
+  setLoading(true);
+  
+  google.script.run
+    .withSuccessHandler(function(reply) {
+      chatHistory = [
+        { role: 'user', content: 'やるべきタスク：「' + taskInput + '」' },
+        { role: 'model', content: reply }
+      ];
+      addChatMessage('assistant', reply);
+      setLoading(false);
+      checkGoalConfirmed(reply);
+    })
+    .withFailureHandler(function(err) {
+      addChatMessage('assistant', '⚠️ エラーが発生しました: ' + err.message);
+      setLoading(false);
+    })
+    .startGoalHearing(taskInput);
+}
+
+// ── Send Message ──
+function sendMessage() {
+  var input = document.getElementById('chatInput');
+  var text = input.value.trim();
+  if (!text || isLoading) return;
+  
+  input.value = '';
+  addChatMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  setLoading(true);
+  
+  google.script.run
+    .withSuccessHandler(function(reply) {
+      chatHistory.push({ role: 'model', content: reply });
+      addChatMessage('assistant', reply);
+      setLoading(false);
+      checkGoalConfirmed(reply);
+    })
+    .withFailureHandler(function(err) {
+      addChatMessage('assistant', '⚠️ エラー: ' + err.message);
+      setLoading(false);
+    })
+    .continueHearing(chatHistory, taskInput);
+}
+
+function checkGoalConfirmed(reply) {
+  if (reply.indexOf('【ゴール確定】') !== -1) {
+    var goalLine = reply.split('【ゴール確定】')[1].trim().split('\n')[0];
+    trueGoal = goalLine;
+    var levelMatch = reply.match(/【選択レベル】Lv(\d)/);
+    if (levelMatch) goalLevel = levelMatch[1];
+    // 事業タイプを抽出（ビジネスの場合のみ）
+    var typeMatch = reply.match(/【事業タイプ】(受託型|プロダクト型)/);
+    if (typeMatch) bizType = typeMatch[1];
+    // ポジショニング軸を抽出
+    var domMatch = reply.match(/【支配軸】(価格|商品力|アクセス|サービス|経験価値)/);
+    if (domMatch) dominateAxis = domMatch[1];
+    var difMatch = reply.match(/【差別化軸】(価格|商品力|アクセス|サービス|経験価値)/);
+    if (difMatch) differAxis = difMatch[1];
+    setTimeout(function() { goToDateStep(); }, 1500);
+  }
+}
+
+function skipToDate() {
+  trueGoal = taskInput;
+  goalLevel = '1';
+  bizType = '';
+  dominateAxis = '';
+  differAxis = '';
+  goToDateStep();
+}
+
+function goToDateStep() {
+  goToStep(2);
+  document.getElementById('goalDisplay').textContent = trueGoal;
+  document.getElementById('goalLevelDisplay').textContent = '抽象度: Lv' + goalLevel;
+  document.getElementById('goalTitle').value = trueGoal;
+  
+  // Show phase selection for business plan tasks
+  var isBizPlan = !isPrivate && /事業計画|新サービス|起業|新規事業|ローンチ|リリース|立ち上げ|ブランド|PR|マーケ|集客/.test(taskInput + trueGoal);
+  document.getElementById('phaseSelection').classList.toggle('hidden', !isBizPlan);
+}
+
+// ── Generate Schedule ──
+function generateSchedule() {
+  var goalDate = document.getElementById('goalDate').value;
+  var goalTime = document.getElementById('goalTime').value;
+  var goalTitle = document.getElementById('goalTitle').value;
+  if (!goalDate) { alert('ゴール日を設定してください'); return; }
+  trueGoal = goalTitle || trueGoal;
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('genBtn').textContent = '⏳ AIがスケジュールを生成中...';
+  
+  // Collect selected phases
+  var selectedPhases = [];
+  var phaseIds = ['ph1','ph2','ph3','ph4','ph5','ph6'];
+  var phaseKeys = ['origin','concept','positioning','brand','validate','awareness'];
+  for (var i = 0; i < phaseIds.length; i++) {
+    var el = document.getElementById(phaseIds[i]);
+    if (el && el.checked) selectedPhases.push(phaseKeys[i]);
+  }
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      document.getElementById('resultDetail').textContent = result.message;
+      goToStep(3);
+      document.getElementById('genBtn').disabled = false;
+      document.getElementById('genBtn').textContent = '逆算スケジュールを生成 →';
+    })
+    .withFailureHandler(function(err) {
+      alert('エラー: ' + err.message);
+      document.getElementById('genBtn').disabled = false;
+      document.getElementById('genBtn').textContent = '逆算スケジュールを生成 →';
+    })
+    .processSchedule({
+      taskInput: taskInput,
+      trueGoal: trueGoal,
+      goalLevel: goalLevel,
+      goalDate: goalDate,
+      goalTime: goalTime,
+      isPrivate: isPrivate,
+      bizType: bizType,
+      dominateAxis: dominateAxis,
+      differAxis: differAxis,
+      selectedPhases: selectedPhases
+    });
+}
+
+function exportCal() {
+  google.script.run
+    .withSuccessHandler(function() {})
+    .withFailureHandler(function(err) { alert('エラー: ' + err.message); })
+    .exportToCalendar();
+}
+
+function resetAll() {
+  taskInput = '';
+  chatHistory = [];
+  trueGoal = '';
+  goalLevel = '2';
+  bizType = '';
+  dominateAxis = '';
+  differAxis = '';
+  document.getElementById('taskInput').value = '';
+  document.getElementById('chatMessages').innerHTML = '';
+  goToStep(0);
+}
+
+// ── Chat Helpers ──
+function addChatMessage(role, text, isTask) {
+  var container = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = 'msg ' + role;
+  var bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  if (isTask) {
+    var label = document.createElement('div');
+    label.className = 'msg-task-label';
+    label.textContent = '📋 入力タスク';
+    bubble.appendChild(label);
+  }
+  bubble.appendChild(document.createTextNode(text));
+  div.appendChild(bubble);
+  container.appendChild(div);
+  var loading = document.getElementById('loadingMsg');
+  if (loading && role === 'assistant') loading.remove();
+  container.scrollTop = container.scrollHeight;
+}
+
+function setLoading(show) {
+  isLoading = show;
+  document.getElementById('sendBtn').disabled = show;
+  var existing = document.getElementById('loadingMsg');
+  if (existing) existing.remove();
+  if (show) {
+    var container = document.getElementById('chatMessages');
+    var div = document.createElement('div');
+    div.className = 'msg assistant';
+    div.id = 'loadingMsg';
+    div.innerHTML = '<div class="msg-bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+}
+
+// ── Init ──
+goToStep(0);
+renderSamples();
+</script>
+</body>
+</html>

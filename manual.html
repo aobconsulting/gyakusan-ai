@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧭 逆算AI — セットアップ＆使い方ガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-hover: #1c2330;
+    --accent: #f97316;
+    --accent-glow: rgba(249,115,22,0.15);
+    --accent2: #38bdf8;
+    --accent3: #a78bfa;
+    --accent4: #34d399;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --border: #30363d;
+    --success: #3fb950;
+    --warning: #d29922;
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 19.2px;
+    overflow-x: hidden;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 40px 20px;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(ellipse at 30% 20%, rgba(249,115,22,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 80%, rgba(56,189,248,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(167,139,250,0.04) 0%, transparent 60%);
+    animation: bgPulse 12s ease-in-out infinite alternate;
+  }
+
+  @keyframes bgPulse {
+    0% { transform: rotate(0deg) scale(1); }
+    100% { transform: rotate(3deg) scale(1.05); }
+  }
+
+  .hero-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: var(--accent-glow);
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 100px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 32px;
+    animation: fadeSlideUp 0.8s ease-out;
+  }
+
+  .hero h1 {
+    position: relative;
+    font-size: clamp(48px, 8vw, 80px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    animation: fadeSlideUp 0.8s ease-out 0.1s both;
+  }
+
+  .hero h1 .emoji { font-size: 0.85em; }
+  .hero h1 .grad {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    position: relative;
+    font-size: 22px;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin-bottom: 48px;
+    animation: fadeSlideUp 0.8s ease-out 0.2s both;
+  }
+
+  .hero-cta {
+    position: relative;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeSlideUp 0.8s ease-out 0.3s both;
+  }
+
+  .hero-cta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 19px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .cta-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(249,115,22,0.3);
+  }
+  .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(249,115,22,0.4); }
+
+  .cta-secondary {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .cta-secondary:hover { border-color: var(--accent); }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Sections ── */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  section {
+    padding: 80px 0;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    font-size: 19px;
+    color: var(--text-dim);
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+
+  /* ── Requirement Cards ── */
+  .req-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .req-card {
+    padding: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: all 0.3s;
+  }
+  .req-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .req-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+  .req-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+  .req-desc { font-size: 17px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ── Steps ── */
+  .steps { counter-reset: step-counter; }
+
+  .step {
+    position: relative;
+    padding: 32px;
+    padding-left: 80px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  .step:hover { border-color: var(--accent); }
+
+  .step::before {
+    counter-increment: step-counter;
+    content: counter(step-counter);
+    position: absolute;
+    left: 24px;
+    top: 28px;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent), #fb923c);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+  }
+
+  .step-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .step-body {
+    font-size: 22px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .step-body code {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    color: var(--accent);
+  }
+
+  .step-body .url-box {
+    display: block;
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: rgba(56,189,248,0.06);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    color: var(--accent2);
+    word-break: break-all;
+  }
+
+  .step-img-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(52,211,153,0.06);
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 10px;
+    font-size: 16px;
+    color: var(--accent4);
+  }
+
+  /* ── Callout ── */
+  .callout {
+    display: flex;
+    gap: 14px;
+    padding: 20px 24px;
+    border-radius: var(--radius);
+    margin: 24px 0;
+    font-size: 22px;
+    line-height: 1.7;
+  }
+  .callout-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+
+  .callout-warn {
+    background: rgba(210,153,34,0.08);
+    border: 1px solid rgba(210,153,34,0.25);
+    color: var(--warning);
+  }
+
+  .callout-info {
+    background: rgba(56,189,248,0.06);
+    border: 1px solid rgba(56,189,248,0.2);
+    color: var(--accent2);
+  }
+
+  .callout-success {
+    background: rgba(63,185,80,0.06);
+    border: 1px solid rgba(63,185,80,0.2);
+    color: var(--success);
+  }
+
+  /* ── Feature Showcase ── */
+  .feature-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .flow-item {
+    display: flex;
+    gap: 20px;
+    padding: 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: all 0.3s;
+    align-items: flex-start;
+  }
+  .flow-item:hover { border-color: var(--accent2); transform: translateX(4px); }
+
+  .flow-num {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 900;
+  }
+
+  .flow-num.c1 { background: linear-gradient(135deg, rgba(249,115,22,0.15), rgba(249,115,22,0.05)); color: var(--accent); }
+  .flow-num.c2 { background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(56,189,248,0.05)); color: var(--accent2); }
+  .flow-num.c3 { background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.05)); color: var(--accent3); }
+  .flow-num.c4 { background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.05)); color: var(--accent4); }
+
+  .flow-content h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .flow-content p {
+    font-size: 17px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .flow-content .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 8px;
+  }
+  .tag-biz { background: rgba(249,115,22,0.12); color: var(--accent); }
+  .tag-priv { background: rgba(56,189,248,0.12); color: var(--accent2); }
+  .tag-new { background: rgba(167,139,250,0.12); color: var(--accent3); }
+
+  /* ── Phase Cards ── */
+  .phase-showcase {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .phase-card {
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+  }
+  .phase-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 3px;
+  }
+  .phase-card.on::after { background: var(--success); }
+  .phase-card.off::after { background: var(--text-dim); }
+
+  .phase-card .phase-status {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .phase-card.on .phase-status { color: var(--success); }
+  .phase-card.off .phase-status { color: var(--text-dim); }
+
+  .phase-card h4 { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+  .phase-card p { font-size: 16px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ── Tips ── */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .tip-card {
+    padding: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: all 0.3s;
+  }
+  .tip-card:hover { transform: translateY(-3px); border-color: var(--accent3); }
+
+  .tip-emoji { font-size: 28px; margin-bottom: 10px; display: block; }
+  .tip-card h4 { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+  .tip-card p { font-size: 17px; color: var(--text-dim); line-height: 1.7; }
+
+  /* ── FAQ ── */
+  .faq-item {
+    padding: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .faq-item:hover { border-color: var(--accent); }
+
+  .faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 19px;
+    font-weight: 700;
+  }
+
+  .faq-q::after {
+    content: '＋';
+    font-size: 20px;
+    color: var(--accent);
+    transition: transform 0.3s;
+  }
+  .faq-item.open .faq-q::after { transform: rotate(45deg); }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, margin 0.3s;
+  }
+  .faq-item.open .faq-a {
+    max-height: 300px;
+    margin-top: 14px;
+  }
+
+  .faq-a p {
+    font-size: 17px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 48px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 17px;
+  }
+  footer .brand {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 12px 24px;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  nav .logo {
+    font-size: 22px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  nav .nav-links {
+    display: flex;
+    gap: 24px;
+  }
+
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--accent); }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .step { padding-left: 24px; padding-top: 72px; }
+    .step::before { top: 20px; left: 24px; }
+    .flow-item { flex-direction: column; }
+    nav .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🧭 逆算AI</div>
+  <div class="nav-links">
+    <a href="#setup">セットアップ</a>
+    <a href="#howto">使い方</a>
+    <a href="#training">思考力UP</a>
+    <a href="#phases">フェーズ選択</a>
+    <a href="#tips">コツ</a>
+    <a href="#faq">FAQ</a>
+  </div>
+</nav>
+
+<!-- ════════ HERO ════════ -->
+<div class="hero">
+  <div class="hero-badge">⚡ Public Edition v2.0 — オープンソース</div>
+  <h1>
+    <span class="emoji">🧭</span> <span class="grad">逆算AI</span><br>
+    セットアップガイド
+  </h1>
+  <p class="hero-sub">
+    ゴールから逆算してAIがスケジュールを自動生成。<br>
+    「何から始めればいいか分からない」を解消する、あなた専用の超高性能秘書。
+  </p>
+  <div class="hero-cta">
+    <a href="#setup" class="cta-primary">🚀 セットアップを始める</a>
+    <a href="#howto" class="cta-secondary">📖 使い方を見る</a>
+  </div>
+</div>
+
+<!-- ════════ REQUIREMENTS ════════ -->
+<section id="requirements">
+  <div class="container">
+    <div class="section-label">📋 REQUIREMENTS</div>
+    <div class="section-title">必要なもの</div>
+    <p class="section-desc">始める前に、以下の3つを確認してください。</p>
+
+    <div class="req-grid">
+      <div class="req-card">
+        <span class="req-icon">📧</span>
+        <div class="req-title">Google アカウント</div>
+        <div class="req-desc">
+          Gmailアカウントでもご利用いただけます。<br>
+          <strong>※ 動作保証は Google Workspace（独自ドメイン）環境のみ</strong>
+        </div>
+      </div>
+      <div class="req-card">
+        <span class="req-icon">📊</span>
+        <div class="req-title">Google スプレッドシート</div>
+        <div class="req-desc">
+          逆算AIはスプレッドシート上で動きます。<br>
+          新規のスプレッドシートを1つ用意してください。
+        </div>
+      </div>
+      <div class="req-card">
+        <span class="req-icon">🔑</span>
+        <div class="req-title">Gemini API キー</div>
+        <div class="req-desc">
+          Google AI Studio で無料で取得できます。<br>
+          Workspace の利用枠とは完全に別なのでご安心を。
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">💡</span>
+      <div>
+        <strong>Workspace枠は消費しません！</strong><br>
+        逆算AIが使うGemini APIは、Google AI Studio経由の独立した無料枠です。<br>
+        Workspace付属のGemini（Docs/Sheets内のAI機能）とは完全に別カウントです。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ SETUP ════════ -->
+<section id="setup" style="padding-top: 40px;">
+  <div class="container">
+    <div class="section-label">🚀 SETUP</div>
+    <div class="section-title">セットアップ手順</div>
+    <p class="section-desc">所要時間：約10分。コピペで完了します。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-title">APIキーを取得する</div>
+        <div class="step-body">
+          Google AI Studio にアクセスして、APIキーを発行します。
+          <span class="url-box">https://aistudio.google.com/apikey</span>
+          「APIキーを作成」→ プロジェクトを選択 →「キーを作成」。<br>
+          生成されたキーをメモ帳にコピーしておきます。
+          <div class="step-img-hint">
+            <span>✅</span> <span>キーは <code>AIza...</code> で始まる長い文字列です</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">スプレッドシートを新規作成</div>
+        <div class="step-body">
+          Google ドライブで<strong>「新規」→「Google スプレッドシート」</strong>を作成。<br>
+          ファイル名はお好みで（例：「逆算AI」「タスク管理」など）。
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">Apps Script エディタを開く</div>
+        <div class="step-body">
+          スプレッドシートの上部メニューから：<br>
+          <strong>「拡張機能」→「Apps Script」</strong><br>
+          別タブでスクリプトエディタが開きます。
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">コードを貼り付ける</div>
+        <div class="step-body">
+          <strong>Code.gs</strong>：エディタに最初から表示されている <code>コード.gs</code> の中身を<strong>全て削除</strong>し、<br>
+          配布された <code>Code.gs</code> の内容を<strong>全てコピペ</strong>します。<br><br>
+          
+          <strong>sidebar.html</strong>：エディタ左側の「＋」ボタン → 「HTML」を選択 →<br>
+          ファイル名を <code>sidebar</code> に変更（.html は自動付与）→<br>
+          配布された <code>sidebar.html</code> の内容を<strong>全てコピペ</strong>します。
+          
+          <div class="step-img-hint">
+            <span>⚠️</span> <span>ファイル名は必ず <code>sidebar</code> にしてください（大文字小文字注意）</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">APIキーを設定する</div>
+        <div class="step-body">
+          スプレッドシートに戻り、<strong>ページを再読み込み</strong>（F5）します。<br>
+          数秒後、メニューに <strong>「🧭 逆算AI」</strong> が出現します。<br><br>
+          
+          <strong>「🧭 逆算AI」→「⚙️ 初期設定」</strong>をクリック。<br>
+          表示されたダイアログにSTEP 1でコピーしたAPIキーを貼り付けて「保存」。
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">権限を承認する</div>
+        <div class="step-body">
+          初回実行時にGoogleから<strong>権限承認</strong>を求められます。<br><br>
+          「このアプリはGoogleで確認されていません」→ <strong>「詳細」→「〇〇（安全ではないページ）に移動」</strong>→<br>
+          「許可」をクリック。
+          
+          <div class="callout callout-warn" style="margin-top:16px;">
+            <span class="callout-icon">🛡️</span>
+            <div>
+              <strong>これは正常な動作です。</strong><br>
+              自分で作成したスクリプトにはこの承認が必要です。<br>
+              外部に情報が送信されることはありません（Gemini APIへの通信のみ）。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">起動する 🎉</div>
+        <div class="step-body">
+          <strong>「🧭 逆算AI」→「🚀 逆算AIを起動」</strong>をクリック。<br>
+          右側にサイドバーが表示されたら、セットアップ完了です！
+          
+          <div class="callout callout-success" style="margin-top:16px;">
+            <span class="callout-icon">🎊</span>
+            <div>
+              <strong>おめでとうございます！</strong><br>
+              これであなた専用の逆算AIが使えるようになりました。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ HOW TO USE ════════ -->
+<section id="howto">
+  <div class="container">
+    <div class="section-label">📖 HOW TO USE</div>
+    <div class="section-title">使い方</div>
+    <p class="section-desc">4ステップでゴールから逆算したスケジュールが完成します。</p>
+
+    <div class="feature-flow">
+      <div class="flow-item">
+        <div class="flow-num c1">①</div>
+        <div class="flow-content">
+          <h3>タスクを入力する</h3>
+          <p>
+            やりたいこと・達成したいことを自由に入力します。<br>
+            「新サービスを立ち上げたい」「結婚式の準備をしたい」など、<br>
+            ざっくりでOK。AIが深掘りしてくれます。
+          </p>
+          <span class="tag tag-biz">💼 ビジネス</span>
+          <span class="tag tag-priv">🌙 プライベート</span>
+          <p style="margin-top:8px;">モード切替で口調とアプローチが変わります。</p>
+        </div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-num c2">②</div>
+        <div class="flow-content">
+          <h3>AIとの対話で本当のゴールを見つける</h3>
+          <p>
+            AIが「なぜそれをやりたいんですか？」「きっかけは？」と質問してきます。<br>
+            これは表面的なタスクの奥にある<strong>本当の目的</strong>を引き出すため。<br>
+            3〜5回の対話で、あなた自身も気づいていなかった本質的なゴールが明確になります。
+          </p>
+          <span class="tag tag-new">✨ NEW: 強みの軸も自然に特定</span>
+        </div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-num c3">③</div>
+        <div class="flow-content">
+          <h3>ゴール日を設定し、フェーズを選択</h3>
+          <p>
+            いつまでに達成したいかを設定。ゴール名の微調整もできます。<br>
+            事業計画系のタスクでは<strong>フェーズ選択パネル</strong>が表示され、<br>
+            必要なフェーズだけをON/OFFで選べます。
+          </p>
+          <span class="tag tag-new">✨ NEW: 6フェーズから自由に選択</span>
+        </div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-num c4">④</div>
+        <div class="flow-content">
+          <h3>スケジュール生成 → 実行へ</h3>
+          <p>
+            AIがゴール日から営業日ベースで逆算し、<br>
+            具体的なマイルストーン付きのスケジュールを自動生成。<br>
+            スプレッドシートに書き出され、Googleカレンダーへのエクスポートも可能。<br>
+            各タスクには<strong>「AIに投げると良いプロンプト」</strong>も付属しています。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ HIDDEN BENEFIT ════════ -->
+<section id="training" style="background: linear-gradient(135deg, rgba(167,139,250,0.06), rgba(249,115,22,0.04));">
+  <div class="container">
+    <div class="section-label">🧠 HIDDEN BENEFIT</div>
+    <div class="section-title">使うだけで「具体⇔抽象」の思考力が鍛えられる</div>
+    <p class="section-desc">
+      逆算AIには、スケジュール生成以外にもう一つ大きな価値があります。
+    </p>
+
+    <div class="callout callout-info" style="flex-direction:column; gap:16px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span class="callout-icon">🎯</span>
+        <strong style="font-size:20px;">具体と抽象を行き来するトレーニング</strong>
+      </div>
+      <div style="color:var(--text); line-height:2;">
+        逆算AIのヒアリングでは、あなたが入力した<strong>具体的なタスク</strong>（例：「提案資料を作る」）に対して、<br>
+        AIが<strong>「なぜそれをやりたいの？」「その先に何を実現したい？」</strong>と抽象度を上げる質問を投げかけます。<br><br>
+        
+        <span style="color:var(--accent);">具体 → 抽象 → さらに抽象 → 真のゴール発見 → 具体的なスケジュールに落とす</span><br><br>
+        
+        この「具体⇔抽象の往復」は、ビジネスにおける<strong>本質的な思考力</strong>そのもの。<br>
+        逆算AIを使い続けることで、普段の仕事でも<strong>「そもそも何のためにやるんだっけ？」</strong>と<br>
+        自然に問いかけられる思考習慣が身につきます。<br><br>
+        
+        スケジュールが完成するだけでなく、<strong>あなた自身の思考の解像度が上がる</strong>。<br>
+        それが逆算AIの隠れた最大の価値です。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ PHASE SELECTION ════════ -->
+<section id="phases" style="background: var(--bg-card);">
+  <div class="container">
+    <div class="section-label">📋 PHASE SELECTION</div>
+    <div class="section-title">フェーズ選択とは？</div>
+    <p class="section-desc">
+      事業計画系のタスクを入力すると、スケジュールに含めるフェーズを選べます。<br>
+      「フルコースメニューを見て、今の自分に必要なものだけ注文する」イメージです。
+    </p>
+
+    <div class="phase-showcase">
+      <div class="phase-card on">
+        <div class="phase-status">✅ デフォルト ON</div>
+        <h4>原点整理</h4>
+        <p>原体験・強みの棚卸し、使命と目指す未来の言語化。全ての土台。</p>
+      </div>
+      <div class="phase-card on">
+        <div class="phase-status">✅ デフォルト ON</div>
+        <h4>コンセプト設計</h4>
+        <p>ターゲット顧客、提供価値、ニッチ戦略、訴求ポイント整理。受託型/プロダクト型で自動分岐。</p>
+      </div>
+      <div class="phase-card on">
+        <div class="phase-status">✅ デフォルト ON</div>
+        <h4>強みのポジショニング</h4>
+        <p>5つの勝負軸から「どこで圧倒的に勝つか」を特定。競合比較マップ作成。<br><small style="color:var(--text-dim);">参考：Crawford & Matthews "Five Way Positioning"</small></p>
+      </div>
+      <div class="phase-card off">
+        <div class="phase-status">☐ オプション</div>
+        <h4>ブランド設計</h4>
+        <p>顧客に届けたい感情・変化・見られ方の言語化。世界観キーワード策定。ビジュアル方針。<br><small style="color:var(--text-dim);">参考：Keller's Brand Equity Model</small></p>
+      </div>
+      <div class="phase-card on">
+        <div class="phase-status">✅ デフォルト ON</div>
+        <h4>検証・実行</h4>
+        <p>モニター獲得、フィードバック収集、ピボット判断。「一勝九敗」の精神で。</p>
+      </div>
+      <div class="phase-card off">
+        <div class="phase-status">☐ オプション</div>
+        <h4>認知拡大・SNS戦略</h4>
+        <p>認知チャネル設計、SNS発信計画。投稿の黄金比率（実績1:情報2:多面性3）。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-info" style="margin-top:32px;">
+      <span class="callout-icon">💡</span>
+      <div>
+        <strong>まずは必須3つ（原点・コンセプト・検証）から始めて、</strong><br>
+        事業が形になってきたらブランド設計やSNS戦略を追加するのがおすすめです。<br>
+        全部ONにすると最大14マイルストーンの本格スケジュールが生成されます。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ TIPS ════════ -->
+<section id="tips">
+  <div class="container">
+    <div class="section-label">💡 TIPS</div>
+    <div class="section-title">もっと使いこなすコツ</div>
+    <p class="section-desc">逆算AIを最大限活用するためのヒント集。</p>
+
+    <div class="tips-grid">
+      <div class="tip-card">
+        <span class="tip-emoji">🎯</span>
+        <h4>ざっくり入力がベスト</h4>
+        <p>「提案資料を作る」より「売上を上げたい」のほうが、AIが本質的なゴールを引き出せます。具体的すぎるとLv1で終わります。</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">💬</span>
+        <h4>AIの質問には正直に</h4>
+        <p>「なぜ？」に対して本音で答えるほど、精度の高いゴール設定ができます。建前より本音。</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">📅</span>
+        <h4>ゴール日は余裕を持って</h4>
+        <p>AIは営業日ベースで逆算します。タイトすぎるとマイルストーンが詰まりすぎるので、少し余裕を持たせましょう。</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">🤖</span>
+        <h4>AIプロンプトを活用</h4>
+        <p>各タスクに付いている「AIに投げると良いプロンプト」をそのままChatGPTやClaudeにコピペすると、タスク実行が捗ります。</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">📊</span>
+        <h4>スプレッドシートで管理</h4>
+        <p>生成されたスケジュールはスプレッドシート上。進捗列を追加したり、チームで共有したり、自由にカスタマイズできます。</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">📆</span>
+        <h4>カレンダー連携</h4>
+        <p>「Googleカレンダーにエクスポート」ボタンで、全マイルストーンが一発でカレンダーに登録されます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FAQ ════════ -->
+<section id="faq" style="background: var(--bg-card);">
+  <div class="container">
+    <div class="section-label">❓ FAQ</div>
+    <div class="section-title">よくある質問</div>
+    <p class="section-desc">困ったときはまずここをチェック。</p>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">メニューに「逆算AI」が表示されません</div>
+      <div class="faq-a"><p>スプレッドシートを<strong>再読み込み（F5）</strong>してください。スクリプトの保存が反映されるまで数秒かかります。それでも出ない場合は、Apps Script エディタで <code>onOpen</code> 関数を手動で実行してみてください。</p></div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Gmailアカウントでも使えますか？</div>
+      <div class="faq-a"><p><strong>はい、使えます。</strong>初回起動時に注意メッセージが表示されますが、「はい」を選べばそのまま利用できます。ただし動作保証はGoogle Workspace（独自ドメイン）環境のみとなります。不具合が出た場合はWorkspaceアカウントでお試しください。</p></div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">APIキーのエラーが出ます</div>
+      <div class="faq-a"><p>Google AI Studio（aistudio.google.com）で取得したキーか確認してください。キーの前後に余計なスペースが入っていないかもチェック。また、APIの利用上限に達している可能性もあります（無料枠は1分あたり15リクエスト）。</p></div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Workspaceの Gemini 利用枠に影響しますか？</div>
+      <div class="faq-a"><p><strong>影響しません。</strong>逆算AIが使うのはGoogle AI Studio経由のGemini APIで、Workspace付属のGemini（Docs/Sheets/Gmail内のAI機能）とは完全に別サービスです。APIキー、課金体系、利用枠すべて独立しています。逆算AIをどれだけ使っても、WorkspaceのGemini枠が減ることはありません。</p></div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">フェーズ選択パネルが表示されません</div>
+      <div class="faq-a"><p>フェーズ選択は<strong>ビジネスモード</strong>で、かつ事業計画系のタスク（新サービス、起業、ブランド、PR、集客など）を入力した場合のみ表示されます。プライベートモードや一般的なビジネスタスクでは表示されません。</p></div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">スケジュールを後から変更できますか？</div>
+      <div class="faq-a"><p>はい。生成されたスケジュールは通常のスプレッドシートなので、自由に編集・並び替え・削除が可能です。AIプロンプト列を使って、各タスクの詳細をさらに深掘りすることもできます。</p></div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">🔒 入力した内容がAIの学習に使われませんか？</div>
+      <div class="faq-a"><p>
+        <strong>正直にお伝えします。</strong><br><br>
+        逆算AIはGemini APIの<strong>無料枠</strong>を使用しています。Googleの利用規約によると、無料枠で送信されたプロンプトと応答は、Googleの製品改善や機械学習技術の向上に使用される場合があります。品質管理のため、人間のレビュアーがAPI入出力を確認することもあります。<br><br>
+        ただし、以下の点はご安心ください：<br>
+        ・レビュー時には<strong>Googleアカウントとの紐付けは解除</strong>されます（匿名化）<br>
+        ・不正利用監視用のログは<strong>モデル学習には使われません</strong>（ポリシー執行目的のみ）<br>
+        ・有料版Gemini APIに切り替えれば、プロンプトは製品改善に使用されません<br><br>
+        <strong>推奨：</strong>パスワード、クレジットカード番号、社外秘の機密情報は入力しないでください。事業のアイデアや目標レベルの情報であれば、通常のリスクは低いと考えられます。
+      </p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CTA ════════ -->
+<section style="background: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(56,189,248,0.06)); padding: 64px 0;">
+  <div class="container" style="text-align:center;">
+    <div class="section-title" style="margin-bottom:20px;">🚀 もっと活用しませんか？</div>
+    <p style="color:var(--text-dim); max-width:600px; margin:0 auto 32px; line-height:2;">
+      逆算AIは<strong>AOB Consulting</strong>が開発したオープンソースツールです。<br>
+      御社の業務に合わせたカスタマイズや、<br>
+      <strong>Claude Code × GASでツールを作れるT型人材の育成</strong>も支援しています。
+    </p>
+    <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+      <a href="https://aobconsulting.co.jp" class="cta-primary" style="text-decoration:none;">🏢 AOB Consultingを見る</a>
+      <a href="https://github.com/aobconsulting" class="cta-secondary" style="text-decoration:none;">⭐ GitHubでスターする</a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer>
+  <div class="brand">🧭 逆算AI</div>
+  <p>Public Edition v2.0</p>
+  <p style="margin-top: 4px;">Powered by Gemini API × Google Apps Script × AOB Consulting
+  <p style="margin-top: 12px;"><a href="https://aobconsulting.co.jp" style="color:var(--accent);text-decoration:none;">🏢 AOB Consulting</a> — IT×教育で企業の人材育成を支援</p></p>
+</footer>
+
+</body>
+</html>
