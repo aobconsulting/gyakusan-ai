@@ -631,12 +631,31 @@
       <div class="step">
         <div class="step-title">APIキーを取得する</div>
         <div class="step-body">
-          Google AI Studio にアクセスして、APIキーを発行します。
+          以下のURLにアクセスします（Googleアカウントでログイン済みの状態で）。
           <span class="url-box">https://aistudio.google.com/apikey</span>
-          「APIキーを作成」→ プロジェクトを選択 →「キーを作成」。<br>
-          生成されたキーをメモ帳にコピーしておきます。
+          
+          <strong>初めての場合：</strong><br>
+          「APIキーを作成」ボタンをクリック → プロジェクト選択画面が出たら<br>
+          <strong>デフォルトの「Generative Language Client」のままでOK</strong>。<br>
+          新しくプロジェクトを作る必要はありません。→「キーを作成」をクリック。<br><br>
+
+          <strong>すでにキーがある場合：</strong><br>
+          画面にキーが一覧表示されていたら、それがあなたのAPIキーです。<br>
+          <strong>新しく作り直す必要はありません。</strong>コピーしてそのまま使えます。<br><br>
+
+          表示されたキーの右のコピーアイコンをクリックして、メモ帳などに貼り付けておきます。
+
           <div class="step-img-hint">
             <span>✅</span> <span>キーは <code>AIza...</code> で始まる長い文字列です</span>
+          </div>
+          
+          <div class="callout callout-warn" style="margin-top:12px;">
+            <span class="callout-icon">⚠️</span>
+            <div>
+              <strong>APIキーは他人に教えないでください。</strong><br>
+              キーが漏れると他人に使われて、あなたの無料枠が消費されます。<br>
+              万が一漏れた場合は、同じ画面でキーを削除→再作成できます。
+            </div>
           </div>
         </div>
       </div>
