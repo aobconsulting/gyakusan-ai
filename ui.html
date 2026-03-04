@@ -538,44 +538,6 @@
   
   .hidden { display: none !important; }
 
-  /* ── Manual Overlay ── */
-  .manual-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 100;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-  }
-  .manual-overlay.hidden { display: none !important; }
-  .manual-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    background: #0f172a;
-    color: white;
-    font-weight: 700;
-    font-size: 15px;
-  }
-  .manual-close {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 8px;
-    padding: 6px 14px;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-  }
-  .manual-close:hover { background: rgba(255,255,255,0.25); }
-  .manual-frame {
-    flex: 1;
-    border: none;
-    width: 100%;
-    background: white;
-  }
   
   /* ── Phase Selection ── */
   .phase-header {
@@ -804,7 +766,7 @@
 <div class="header" id="mainHeader" style="position:relative;">
   <h1>🧭 逆算<span class="accent">AI</span></h1>
   <div class="subtitle" id="headerSubtitle">あなた専属のAI参謀</div>
-  <a class="guide-link" href="#" onclick="showManual(); return false;">📖 使い方</a>
+  <a class="guide-link" href="#" onclick="openManualTab(); return false;">📖 使い方</a>
   <a class="guide-link hidden" id="topLink" onclick="resetAll()" style="right:auto; left:12px; cursor:pointer;">🏠 TOP</a>
 </div>
 
@@ -981,14 +943,6 @@
   </div>
 </div>
 
-<!-- Manual Overlay -->
-<div class="manual-overlay hidden" id="manualOverlay">
-  <div class="manual-header">
-    <span>📖 使い方ガイド</span>
-    <button class="manual-close" onclick="closeManual()">✕ 閉じる</button>
-  </div>
-  <iframe class="manual-frame" id="manualFrame"></iframe>
-</div>
 
 <script>
 // ── State ──
@@ -1393,20 +1347,18 @@ function setLoading(show) {
   }
 }
 
-// ── Manual ──
-function showManual() {
-  var overlay = document.getElementById('manualOverlay');
-  var iframe = document.getElementById('manualFrame');
-  overlay.classList.remove('hidden');
-  if (!iframe.srcdoc) {
-    google.script.run
-      .withSuccessHandler(function(html) { iframe.srcdoc = html; })
-      .withFailureHandler(function() { iframe.srcdoc = '<p style="padding:20px;">マニュアルの読み込みに失敗しました。</p>'; })
-      .getManualHtml();
-  }
-}
-function closeManual() {
-  document.getElementById('manualOverlay').classList.add('hidden');
+// ── Manual (別タブで開く) ──
+function openManualTab() {
+  var url = window.location.href;
+  // GASウェブアプリURLの末尾を /dev や /exec として manual ページ用パラメータ付きで開く
+  // 実際にはGAS側で別ルートは作れないので、getManualHtml の結果を Blob URL で別タブに表示
+  google.script.run
+    .withSuccessHandler(function(html) {
+      var w = window.open('', '_blank');
+      if (w) { w.document.write(html); w.document.close(); }
+    })
+    .withFailureHandler(function() { alert('マニュアルの読み込みに失敗しました。'); })
+    .getManualHtml();
 }
 
 // ── Init ──
