@@ -10,39 +10,78 @@
 //   RsEsPs (電通)
 // ============================================================
 
-// ── メニュー & サイドバー ──
+// ── メニュー & ウェブアプリ ──
 
 function onOpen() {
+  // スプレッドシートIDをスクリプトプロパティに保存（ウェブアプリから参照するため）
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', ss.getId());
+  
   SpreadsheetApp.getUi()
     .createMenu('🧭 逆算AI')
-    .addItem('逆算AIを起動', 'showSidebar')
-    .addItem('Googleカレンダーに書き出し', 'exportToCalendar')
+    .addItem('🚀 逆算AIを起動', 'openWebApp')
+    .addItem('📅 Googleカレンダーに書き出し', 'exportToCalendar')
     .addSeparator()
-    .addItem('初期設定', 'showSetup')
+    .addItem('⚙️ 初期設定（APIキー）', 'showSetup')
     .addToUi();
 }
 
-function showSidebar() {
-  // Gmailアカウントの場合は注意表示（ブロックはしない）
-  var email = Session.getActiveUser().getEmail();
-  if (email && email.endsWith('@gmail.com')) {
-    var ui = SpreadsheetApp.getUi();
-    var result = ui.alert(
-      '📋 ご利用環境について',
-      '個人のGmailアカウントでもご利用いただけますが、\n' +
-      '動作保証はGoogle Workspace（独自ドメイン）環境のみとなります。\n\n' +
-      '一部の機能が正常に動作しない場合があります。\n' +
-      'ご了承の上ご利用ください。\n\n' +
-      '続行しますか？',
-      ui.ButtonSet.YES_NO
-    );
-    if (result !== ui.Button.YES) return;
-  }
-  
-  var html = HtmlService.createHtmlOutputFromFile('sidebar')
+// スプレッドシートを取得（ウェブアプリ対応）
+function getSpreadsheet() {
+  // まずアクティブを試す（スプレッドシートから直接実行の場合）
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss) return ss;
+  } catch(e) {}
+  // ウェブアプリの場合：保存済みIDから開く
+  var ssId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+  if (ssId) return SpreadsheetApp.openById(ssId);
+  throw new Error('スプレッドシートが見つかりません。一度スプレッドシートを開いてメニューを表示させてください。');
+}
+
+// ウェブアプリとしてHTMLを返す
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('sidebar')
     .setTitle('🧭 逆算AI')
-    .setWidth(420);
-  SpreadsheetApp.getUi().showSidebar(html);
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// メニューからウェブアプリを別タブで開く
+function openWebApp() {
+  var url = ScriptApp.getService().getUrl();
+  if (!url) {
+    SpreadsheetApp.getUi().alert(
+      '⚠️ ウェブアプリが未デプロイです\n\n' +
+      '「拡張機能」→「Apps Script」→「デプロイ」→「新しいデプロイ」で\n' +
+      'ウェブアプリとしてデプロイしてください。\n\n' +
+      '①種類: ウェブアプリ\n' +
+      '②次のユーザーとして実行: 自分\n' +
+      '③アクセスできるユーザー: 同じドメイン内（組織全体で使う場合）'
+    );
+    return;
+  }
+  // 別タブで開く
+  var html = HtmlService.createHtmlOutput(
+    '<script>window.open("' + url + '", "_blank");google.script.host.close();</script>'
+  ).setWidth(1).setHeight(1);
+  SpreadsheetApp.getUi().showModalDialog(html, '起動中...');
+}
+
+// APIキーの状態チェック（ウェブアプリから呼ばれる）
+function checkApiKey() {
+  var key = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+  return {
+    isSet: !!key,
+    masked: key ? key.slice(0, 8) + '...' : ''
+  };
+}
+
+// APIキーを保存（ウェブアプリから呼ばれる）
+function saveApiKey(apiKey) {
+  if (!apiKey || !apiKey.trim()) return { success: false, message: 'キーが空です' };
+  PropertiesService.getScriptProperties().setProperty('GEMINI_API_KEY', apiKey.trim());
+  return { success: true, message: '保存しました' };
 }
 
 function showSetup() {
@@ -485,7 +524,7 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
 // ── スプレッドシートに書き出し ──
 
 function writeScheduleToSheet(taskInput, trueGoal, goalLevel, goalDateStr, goalTime, scheduleData, isPrivate) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet();
   var sheetName = '逆算スケジュール';
   var sheet = ss.getSheetByName(sheetName);
   
@@ -635,18 +674,16 @@ function writeScheduleToSheet(taskInput, trueGoal, goalLevel, goalDateStr, goalT
 // ── Googleカレンダー書き出し ──
 
 function exportToCalendar() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet();
   var dataSheet = ss.getSheetByName('_calendar_data');
   
   if (!dataSheet) {
-    SpreadsheetApp.getUi().alert('⚠️ まだスケジュールが生成されていません。\n先に逆算AIでスケジュールを作成してください。');
-    return;
+    return { success: false, message: '⚠️ まだスケジュールが生成されていません。\n先に逆算AIでスケジュールを作成してください。' };
   }
   
   var jsonStr = dataSheet.getRange(1, 1).getValue();
   if (!jsonStr) {
-    SpreadsheetApp.getUi().alert('⚠️ スケジュールデータが見つかりません。');
-    return;
+    return { success: false, message: '⚠️ スケジュールデータが見つかりません。' };
   }
   
   var events = JSON.parse(jsonStr);
@@ -672,7 +709,7 @@ function exportToCalendar() {
     count++;
   }
   
-  SpreadsheetApp.getUi().alert('✅ Googleカレンダーに ' + count + ' 件のイベントを登録しました！');
+  return { success: true, message: '✅ Googleカレンダーに ' + count + ' 件のイベントを登録しました！' };
 }
 
 // ── サイドバーから呼ばれるブリッジ関数 ──

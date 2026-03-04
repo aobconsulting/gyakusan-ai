@@ -25,6 +25,7 @@
     --border: #e2e8f0;
     --shadow: 0 1px 3px rgba(0,0,0,0.06);
     --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --max-width: 640px;
   }
   
   .theme-private {
@@ -51,13 +52,14 @@
     font-size: 18px;
     line-height: 1.7;
     transition: background 0.4s ease;
+    min-height: 100vh;
   }
   
   /* ── Header ── */
   .header {
     background: var(--bg-header);
     color: white;
-    padding: 20px 16px 16px;
+    padding: 24px 16px 20px;
     text-align: center;
     position: sticky;
     top: 0;
@@ -124,7 +126,11 @@
   .step-arrow { color: var(--border); font-size: 12px; }
   
   /* ── Content ── */
-  .content { padding: 18px 16px; }
+  .content { 
+    padding: 24px 20px;
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
   
   /* ── Type Toggle ── */
   .type-toggle {
@@ -247,7 +253,7 @@
   .chat-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 150px);
+    height: calc(100vh - 160px);
   }
   .chat-messages {
     flex: 1;
@@ -266,8 +272,8 @@
   .msg.user { justify-content: flex-end; }
   .msg.assistant { justify-content: flex-start; }
   .msg-bubble {
-    max-width: 88%;
-    padding: 12px 14px;
+    max-width: 85%;
+    padding: 14px 18px;
     border-radius: 16px;
     font-size: 17px;
     line-height: 1.8;
@@ -530,7 +536,7 @@
   .feature-hint .hint-icon { font-size: 19px; flex-shrink: 0; margin-top: 1px; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   
-  .hidden { display: none; }
+  .hidden { display: none !important; }
   
   /* ── Phase Selection ── */
   .phase-header {
@@ -574,14 +580,37 @@
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  
+  /* ── API Error Banner ── */
+  .api-error-banner {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin: 12px 16px;
+    font-size: 13px;
+    color: #dc2626;
+    display: none;
+  }
+  .api-error-banner.visible { display: block; }
+
+  /* settings-btn削除済み */
+
 </style>
 </head>
 <body>
 
+<!-- Setup Screen (shown if no API key) -->
+<!-- API Error Banner -->
+<div class="api-error-banner" id="apiErrorBanner">
+  ⚠️ APIキーが未設定またはエラーです。Apps Script の「プロジェクトの設定」→「スクリプトプロパティ」に <strong>GEMINI_API_KEY</strong> を設定してください。
+</div>
+
 <!-- Header -->
-<div class="header" id="mainHeader">
+<div class="header" id="mainHeader" style="position:relative;">
   <h1>🧭 逆算<span class="accent">AI</span></h1>
   <div class="subtitle" id="headerSubtitle">あなた専属のAI参謀</div>
+  <button class="settings-btn" onclick="toggleSetup()" title="設定" style="display:none;">⚙️</button>
 </div>
 
 <!-- Steps -->
@@ -639,7 +668,10 @@
         <input type="text" class="chat-input" id="chatInput" placeholder="回答を入力..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="send-btn" onclick="sendMessage()" id="sendBtn">送信</button>
       </div>
-      <button class="skip-btn" onclick="skipToDate()">⏭ スキップして日程設定へ</button>
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button class="skip-btn" onclick="skipToDate()" style="flex:1;">⏭ スキップして日程設定へ</button>
+        <button class="skip-btn" onclick="resetAll()" style="flex:0 0 auto; background:rgba(100,116,139,0.08); color:var(--text-dim);">↩ 最初に戻る</button>
+      </div>
     </div>
   </div>
 </div>
@@ -848,7 +880,11 @@ function startHearing() {
       checkGoalConfirmed(reply);
     })
     .withFailureHandler(function(err) {
-      addChatMessage('assistant', '⚠️ エラーが発生しました: ' + err.message);
+      var msg = err.message || '';
+      if (msg.indexOf('GEMINI_API_KEY') !== -1 || msg.indexOf('quota') !== -1 || msg.indexOf('API key') !== -1) {
+        document.getElementById('apiErrorBanner').classList.add('visible');
+      }
+      addChatMessage('assistant', '⚠️ エラーが発生しました: ' + msg);
       setLoading(false);
     })
     .startGoalHearing(taskInput);
@@ -963,9 +999,23 @@ function generateSchedule() {
 }
 
 function exportCal() {
+  var btn = document.querySelector('#step3 .btn-primary');
+  btn.disabled = true;
+  btn.textContent = '⏳ カレンダーに登録中...';
+  
   google.script.run
-    .withSuccessHandler(function() {})
-    .withFailureHandler(function(err) { alert('エラー: ' + err.message); })
+    .withSuccessHandler(function(result) {
+      btn.disabled = false;
+      btn.textContent = '📅 Googleカレンダーに書き出す';
+      if (result && result.message) {
+        alert(result.message);
+      }
+    })
+    .withFailureHandler(function(err) {
+      btn.disabled = false;
+      btn.textContent = '📅 Googleカレンダーに書き出す';
+      alert('エラー: ' + err.message);
+    })
     .exportToCalendar();
 }
 
@@ -1020,8 +1070,12 @@ function setLoading(show) {
 }
 
 // ── Init ──
-goToStep(0);
-renderSamples();
+function init() {
+  goToStep(0);
+  renderSamples();
+}
+
+init();
 </script>
 </body>
 </html>
