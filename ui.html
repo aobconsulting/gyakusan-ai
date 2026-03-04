@@ -633,6 +633,39 @@
   }
   .api-error-banner.visible { display: block; }
 
+  /* ── Quick Reply Buttons ── */
+  .quick-reply {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0;
+    padding: 0 4px;
+    animation: msgIn 0.3s ease-out;
+  }
+  .quick-reply-btn {
+    padding: 13px 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .quick-reply-yes {
+    background: var(--primary);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+  }
+  .quick-reply-yes:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+  .quick-reply-no {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1.5px dashed var(--border);
+  }
+  .quick-reply-no:hover { border-color: var(--primary); color: var(--primary); }
+
   /* ── Preview Cards ── */
   .preview-item {
     background: var(--bg-card);
@@ -827,12 +860,12 @@
 <div class="content hidden" id="step1">
   <div class="chat-container">
     <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input-area">
+    <div class="chat-input-area hidden" id="chatInputArea">
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chatInput" placeholder="回答を入力..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="send-btn" onclick="sendMessage()" id="sendBtn">送信</button>
       </div>
-      <button class="skip-btn" onclick="skipToDate()" style="margin-top:6px;">質問をスキップしてスケジュール作成へ →</button>
+      <button class="skip-btn" onclick="skipToDate()" style="margin-top:6px;">スキップしてスケジュール作成へ →</button>
     </div>
   </div>
 </div>
@@ -1063,7 +1096,9 @@ function startHearing() {
       ];
       addChatMessage('assistant', reply);
       setLoading(false);
-      checkGoalConfirmed(reply);
+      if (!checkGoalConfirmed(reply)) {
+        showQuickReply();
+      }
     })
     .withFailureHandler(function(err) {
       var msg = err.message || '';
@@ -1107,25 +1142,65 @@ function checkGoalConfirmed(reply) {
     trueGoal = goalLine;
     var levelMatch = reply.match(/【選択レベル】Lv(\d)/);
     if (levelMatch) goalLevel = levelMatch[1];
-    // 事業タイプを抽出（ビジネスの場合のみ）
     var typeMatch = reply.match(/【事業タイプ】(受託型|プロダクト型)/);
     if (typeMatch) bizType = typeMatch[1];
-    // ポジショニング軸を抽出
     var domMatch = reply.match(/【支配軸】(価格|商品力|アクセス|サービス|経験価値)/);
     if (domMatch) dominateAxis = domMatch[1];
     var difMatch = reply.match(/【差別化軸】(価格|商品力|アクセス|サービス|経験価値)/);
     if (difMatch) differAxis = difMatch[1];
     setTimeout(function() { goToDateStep(); }, 1500);
+    return true;
   }
+  return false;
 }
 
 function skipToDate() {
+  var qr = document.getElementById('quickReply');
+  if (qr) qr.remove();
   trueGoal = taskInput;
   goalLevel = '1';
   bizType = '';
   dominateAxis = '';
   differAxis = '';
   goToDateStep();
+}
+
+function showQuickReply() {
+  var container = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.id = 'quickReply';
+  div.className = 'quick-reply';
+  div.innerHTML =
+    '<button class="quick-reply-btn quick-reply-yes" onclick="quickReplyYes()">はい、お願いします</button>' +
+    '<button class="quick-reply-btn quick-reply-no" onclick="quickReplyNo()">スキップしてスケジュール作成へ →</button>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function quickReplyYes() {
+  var qr = document.getElementById('quickReply');
+  if (qr) qr.remove();
+  document.getElementById('chatInputArea').classList.remove('hidden');
+  document.getElementById('chatInput').focus();
+  addChatMessage('user', 'はい、お願いします');
+  chatHistory.push({ role: 'user', content: 'はい、お願いします' });
+  setLoading(true);
+  google.script.run
+    .withSuccessHandler(function(reply) {
+      chatHistory.push({ role: 'model', content: reply });
+      addChatMessage('assistant', reply);
+      setLoading(false);
+      checkGoalConfirmed(reply);
+    })
+    .withFailureHandler(function(err) {
+      addChatMessage('assistant', '⚠️ エラー: ' + err.message);
+      setLoading(false);
+    })
+    .continueHearing(chatHistory, taskInput);
+}
+
+function quickReplyNo() {
+  skipToDate();
 }
 
 function goToDateStep() {
@@ -1277,6 +1352,7 @@ function resetAll() {
   schedulePreviewData = [];
   document.getElementById('taskInput').value = '';
   document.getElementById('chatMessages').innerHTML = '';
+  document.getElementById('chatInputArea').classList.add('hidden');
   goToStep(0);
 }
 
