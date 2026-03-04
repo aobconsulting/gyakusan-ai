@@ -49,6 +49,11 @@ function doGet(e) {
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
+// ウェブアプリのURLを返す（クライアント側から呼ばれる）
+function getWebAppUrl() {
+  return ScriptApp.getService().getUrl();
+}
+
 // メニューからウェブアプリを別タブで開く
 function openWebApp() {
   var url = ScriptApp.getService().getUrl();

@@ -784,6 +784,7 @@
   </div>
   
   <button class="btn-primary" onclick="generateSchedule()" id="genBtn">逆算スケジュールを生成 →</button>
+  <button class="btn-secondary" onclick="resetAll()">↩ 最初に戻る</button>
 </div>
 
 <!-- Step 3: Result -->
@@ -1095,8 +1096,11 @@ function setLoading(show) {
 
 // ── Manual ──
 function openManual() {
-  var base = window.location.href.split('?')[0];
-  window.open(base + '?page=manual', '_blank');
+  google.script.run
+    .withSuccessHandler(function(url) {
+      if (url) window.open(url + '?page=manual', '_blank');
+    })
+    .getWebAppUrl();
 }
 
 // ── Init ──
