@@ -155,7 +155,7 @@ function callGemini(messages, systemPrompt) {
     return '⚠️ Gemini APIキーが設定されていません。メニュー「逆算AI」→「初期設定」からAPIキーを設定してください。';
   }
   
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey;
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey;
   
   // Gemini API形式に変換
   var contents = [];
