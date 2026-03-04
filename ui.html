@@ -634,7 +634,7 @@
 <div class="header" id="mainHeader" style="position:relative;">
   <h1>🧭 逆算<span class="accent">AI</span></h1>
   <div class="subtitle" id="headerSubtitle">あなた専属のAI参謀</div>
-  <a class="guide-link" href="https://htmlpreview.github.io/?https://github.com/aobconsulting/gyakusan-ai/blob/main/manual.html" target="_blank">📖 使い方</a>
+  <a class="guide-link" id="guideLink" href="#" onclick="openManual(); return false;">📖 使い方</a>
 </div>
 
 <!-- Steps -->
@@ -1091,6 +1091,12 @@ function setLoading(show) {
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
   }
+}
+
+// ── Manual ──
+function openManual() {
+  var base = window.location.href.split('?')[0];
+  window.open(base + '?page=manual', '_blank');
 }
 
 // ── Init ──

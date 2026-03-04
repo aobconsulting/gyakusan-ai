@@ -39,10 +39,12 @@ function getSpreadsheet() {
   throw new Error('スプレッドシートが見つかりません。一度スプレッドシートを開いてメニューを表示させてください。');
 }
 
-// ウェブアプリとしてHTMLを返す
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('sidebar')
-    .setTitle('🧭 逆算AI')
+// ウェブアプリとしてHTMLを返す（?page=manual でマニュアル表示）
+function doGet(e) {
+  var page = (e && e.parameter && e.parameter.page === 'manual') ? 'manual' : 'sidebar';
+  var title = page === 'manual' ? '📖 逆算AI 使い方ガイド' : '🧭 逆算AI';
+  return HtmlService.createHtmlOutputFromFile(page)
+    .setTitle(title)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
