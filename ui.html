@@ -634,7 +634,8 @@
 <div class="header" id="mainHeader" style="position:relative;">
   <h1>🧭 逆算<span class="accent">AI</span></h1>
   <div class="subtitle" id="headerSubtitle">あなた専属のAI参謀</div>
-  <a class="guide-link" id="guideLink" href="#" target="_blank">📖 使い方</a>
+  <a class="guide-link" href="<?= manualUrl ?>" target="_blank">📖 使い方</a>
+  <a class="guide-link hidden" id="topLink" onclick="resetAll()" style="right:auto; left:12px; cursor:pointer;">🏠 TOP</a>
 </div>
 
 <!-- Steps -->
@@ -860,6 +861,7 @@ function goToStep(n) {
     if (i === n) si.classList.add('active');
   }
   currentStep = n;
+  document.getElementById('topLink').classList.toggle('hidden', n === 0);
 }
 
 // ── Type Toggle ──
@@ -1098,16 +1100,6 @@ function setLoading(show) {
 function init() {
   goToStep(0);
   renderSamples();
-  // ウェブアプリURLを取得して使い方リンクを有効化
-  if (typeof google !== 'undefined' && google.script && google.script.run) {
-    google.script.run
-      .withSuccessHandler(function(url) {
-        if (url) {
-          document.getElementById('guideLink').href = url + '?page=manual';
-        }
-      })
-      .getWebAppUrl();
-  }
 }
 
 init();

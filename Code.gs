@@ -43,15 +43,18 @@ function getSpreadsheet() {
 function doGet(e) {
   var page = (e && e.parameter && e.parameter.page === 'manual') ? 'manual' : 'ui';
   var title = page === 'manual' ? '📖 逆算AI 使い方ガイド' : '🧭 逆算AI';
+  if (page === 'ui') {
+    var tmpl = HtmlService.createTemplateFromFile('ui');
+    tmpl.manualUrl = (ScriptApp.getService().getUrl() || '') + '?page=manual';
+    return tmpl.evaluate()
+      .setTitle(title)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
   return HtmlService.createHtmlOutputFromFile(page)
     .setTitle(title)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-}
-
-// ウェブアプリのURLを返す（クライアント側から呼ばれる）
-function getWebAppUrl() {
-  return ScriptApp.getService().getUrl();
 }
 
 // メニューからウェブアプリを別タブで開く
