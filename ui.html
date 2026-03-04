@@ -594,7 +594,31 @@
   }
   .api-error-banner.visible { display: block; }
 
-  /* settings-btn削除済み */
+  /* ── Guide Link ── */
+  .guide-link {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .guide-link:hover {
+    background: rgba(255,255,255,0.25);
+    color: white;
+  }
 
 </style>
 </head>
@@ -610,7 +634,7 @@
 <div class="header" id="mainHeader" style="position:relative;">
   <h1>🧭 逆算<span class="accent">AI</span></h1>
   <div class="subtitle" id="headerSubtitle">あなた専属のAI参謀</div>
-  <button class="settings-btn" onclick="toggleSetup()" title="設定" style="display:none;">⚙️</button>
+  <a class="guide-link" href="https://htmlpreview.github.io/?https://github.com/aobconsulting/gyakusan-ai/blob/main/manual.html" target="_blank">📖 使い方</a>
 </div>
 
 <!-- Steps -->
