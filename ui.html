@@ -634,7 +634,7 @@
 <div class="header" id="mainHeader" style="position:relative;">
   <h1>🧭 逆算<span class="accent">AI</span></h1>
   <div class="subtitle" id="headerSubtitle">あなた専属のAI参謀</div>
-  <a class="guide-link" id="guideLink" href="#" onclick="openManual(); return false;">📖 使い方</a>
+  <a class="guide-link" id="guideLink" href="#" target="_blank">📖 使い方</a>
 </div>
 
 <!-- Steps -->
@@ -1094,14 +1094,6 @@ function setLoading(show) {
   }
 }
 
-// ── Manual ──
-var webAppUrl = '';
-function openManual() {
-  if (webAppUrl) {
-    window.open(webAppUrl + '?page=manual', '_blank');
-  }
-}
-
 // ── Init ──
 function init() {
   goToStep(0);
@@ -1110,11 +1102,8 @@ function init() {
   if (typeof google !== 'undefined' && google.script && google.script.run) {
     google.script.run
       .withSuccessHandler(function(url) {
-        webAppUrl = url || '';
-        if (webAppUrl) {
-          var link = document.getElementById('guideLink');
-          link.href = webAppUrl + '?page=manual';
-          link.target = '_blank';
+        if (url) {
+          document.getElementById('guideLink').href = url + '?page=manual';
         }
       })
       .getWebAppUrl();
