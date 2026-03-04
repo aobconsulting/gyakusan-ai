@@ -729,7 +729,226 @@ function exportToCalendar() {
   return { success: true, message: '✅ Googleカレンダーに ' + count + ' 件のイベントを登録しました！' };
 }
 
-// ── サイドバーから呼ばれるブリッジ関数 ──
+// ── プレビュー用：スケジュール生成のみ（シート書き込みなし） ──
+
+function generateScheduleOnly(params) {
+  var scheduleData = generateScheduleData(
+    params.taskInput,
+    params.trueGoal,
+    params.goalLevel,
+    params.goalDate,
+    params.goalTime,
+    params.isPrivate,
+    params.bizType || '',
+    params.dominateAxis || '',
+    params.differAxis || '',
+    params.selectedPhases || []
+  );
+
+  var goalDate = new Date(params.goalDate);
+  var items = [];
+  for (var i = 0; i < scheduleData.length; i++) {
+    var item = scheduleData[i];
+    var itemDate;
+    if (item.daysBefore === 0) {
+      itemDate = new Date(goalDate);
+    } else if (params.isPrivate) {
+      itemDate = new Date(goalDate);
+      itemDate.setDate(itemDate.getDate() - item.daysBefore);
+    } else {
+      itemDate = subtractBusinessDays(goalDate, item.daysBefore);
+    }
+    items.push({
+      id: i,
+      title: item.title,
+      date: Utilities.formatDate(itemDate, 'Asia/Tokyo', 'yyyy-MM-dd'),
+      time: item.daysBefore === 0 ? params.goalTime : '09:00',
+      category: item.category || 'draft',
+      description: item.description || '',
+      aiPrompt: item.aiPrompt || '',
+      daysBefore: item.daysBefore
+    });
+  }
+  // daysBefore降順でソート（遠い日付が先）
+  items.sort(function(a, b) { return b.daysBefore - a.daysBefore; });
+  // id振り直し
+  for (var j = 0; j < items.length; j++) items[j].id = j;
+
+  return { success: true, items: items };
+}
+
+// ── プレビューからスプレッドシートに保存 ──
+
+function saveToSheet(params) {
+  var ss = getSpreadsheet();
+  var items = params.items;
+  var taskInput = params.taskInput;
+  var trueGoal = params.trueGoal;
+  var goalLevel = params.goalLevel;
+  var goalDate = params.goalDate;
+  var goalTime = params.goalTime;
+  var isPrivate = params.isPrivate;
+
+  // シート名を生成
+  var now = new Date();
+  var taskShort = taskInput.replace(/[\s　]/g, '').substring(0, 10);
+  var timestamp = Utilities.formatDate(now, 'Asia/Tokyo', 'MMdd_HHmm');
+  var email = Session.getActiveUser().getEmail();
+  var userName = '';
+  if (email) {
+    var localPart = email.split('@')[0];
+    var editors = ss.getEditors();
+    var viewers = ss.getViewers();
+    if (editors.length + viewers.length > 1) {
+      userName = '_' + localPart;
+    }
+  }
+  var sheetName = taskShort + userName + '_' + timestamp;
+  var sheet = ss.insertSheet(sheetName);
+
+  // ヘッダー情報
+  sheet.getRange('A1').setValue('🧭 逆算AI スケジュール').setFontSize(16).setFontWeight('bold').setFontColor('#D97706');
+  sheet.getRange('A2').setValue('作成日: ' + Utilities.formatDate(now, 'Asia/Tokyo', 'yyyy/MM/dd HH:mm'));
+  sheet.getRange('A3').setValue('元のタスク: ' + taskInput);
+  sheet.getRange('A4').setValue('真のゴール（Lv' + goalLevel + '）: ' + trueGoal);
+  sheet.getRange('A5').setValue('ゴール日: ' + goalDate + ' ' + goalTime);
+  sheet.getRange('A6').setValue(isPrivate ? '種別: プライベート' : '種別: ビジネス');
+
+  // テーブルヘッダー
+  var headerRow = 8;
+  var headers = ['#', '日付', '曜日', '残り日数', 'カテゴリ', 'タスク', '説明', 'AIプロンプト', '完了'];
+  sheet.getRange(headerRow, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(headerRow, 1, 1, headers.length)
+    .setBackground('#D97706')
+    .setFontColor('#FFFFFF')
+    .setFontWeight('bold')
+    .setHorizontalAlignment('center');
+
+  var catEmoji = {
+    'draft': '✏️ 作成', 'review': '🔄 レビュー', 'meeting': '👥 共有',
+    'research': '🔍 調査', 'booking': '📞 予約', 'final': '✨ 最終調整', 'goal': '🎯 ゴール'
+  };
+  var catColors = {
+    'draft': '#DBEAFE', 'review': '#EDE9FE', 'meeting': '#D1FAE5',
+    'research': '#FEF3C7', 'booking': '#FCE7F3', 'final': '#FEF3C7', 'goal': '#FEE2E2'
+  };
+
+  var calendarEvents = [];
+  var days = ['日', '月', '火', '水', '木', '金', '土'];
+
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var itemDate = new Date(item.date);
+    var row = headerRow + 1 + i;
+    var dayStr = item.daysBefore === 0 ? '当日' : item.daysBefore + (isPrivate ? '日前' : '営業日前');
+    var cat = catEmoji[item.category] || item.category;
+    var bgColor = catColors[item.category] || '#FFFFFF';
+
+    var rowData = [
+      i + 1,
+      Utilities.formatDate(itemDate, 'Asia/Tokyo', 'yyyy/MM/dd'),
+      days[itemDate.getDay()],
+      dayStr,
+      cat,
+      item.title,
+      item.description,
+      item.aiPrompt || '',
+      '☐'
+    ];
+    sheet.getRange(row, 1, 1, rowData.length).setValues([rowData]);
+    sheet.getRange(row, 1, 1, rowData.length).setBackground(bgColor);
+    if (item.daysBefore === 0) {
+      sheet.getRange(row, 1, 1, rowData.length).setFontWeight('bold').setFontColor('#DC2626');
+    }
+
+    calendarEvents.push({
+      title: '【逆算AI】' + item.title,
+      date: item.date,
+      time: item.time || '09:00',
+      description: item.description + (item.aiPrompt ? '\n\n💡 AIプロンプト:\n' + item.aiPrompt : ''),
+      category: item.category
+    });
+  }
+
+  // 書式設定
+  sheet.setColumnWidth(1, 40);
+  sheet.setColumnWidth(2, 100);
+  sheet.setColumnWidth(3, 50);
+  sheet.setColumnWidth(4, 90);
+  sheet.setColumnWidth(5, 100);
+  sheet.setColumnWidth(6, 200);
+  sheet.setColumnWidth(7, 250);
+  sheet.setColumnWidth(8, 350);
+  sheet.setColumnWidth(9, 50);
+
+  var lastRow = headerRow + items.length;
+  sheet.getRange(headerRow, 1, items.length + 1, headers.length)
+    .setBorder(true, true, true, true, true, true, '#D1D5DB', SpreadsheetApp.BorderStyle.SOLID);
+  sheet.getRange(headerRow + 1, 7, items.length, 2).setWrap(true);
+
+  // _calendar_data に保存
+  var dataSheet = ss.getSheetByName('_calendar_data');
+  if (!dataSheet) {
+    dataSheet = ss.insertSheet('_calendar_data');
+    dataSheet.hideSheet();
+  } else {
+    dataSheet.clear();
+  }
+  dataSheet.getRange(1, 1).setValue(JSON.stringify(calendarEvents));
+  ss.setActiveSheet(sheet);
+
+  return {
+    success: true,
+    message: '✅ スプレッドシートに保存しました！\n\n' +
+      '📋 ' + items.length + '個のマイルストーン\n' +
+      '📄 シート名: ' + sheetName,
+    eventCount: items.length
+  };
+}
+
+// ── プレビューからGoogleカレンダーに保存 ──
+
+function saveToCalendar(params) {
+  var items = params.items;
+  var calendar = CalendarApp.getDefaultCalendar();
+  var count = 0;
+
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var startDate = new Date(item.date);
+    var timeParts = (item.time || '09:00').split(':');
+    startDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0);
+    var endDate = new Date(startDate);
+    endDate.setHours(startDate.getHours() + 1);
+
+    var desc = item.description || '';
+    if (item.aiPrompt) desc += '\n\n💡 AIプロンプト:\n' + item.aiPrompt;
+
+    calendar.createEvent('【逆算AI】' + item.title, startDate, endDate, {
+      description: desc
+    });
+    count++;
+  }
+
+  return {
+    success: true,
+    message: '✅ Googleカレンダーに ' + count + ' 件のイベントを登録しました！'
+  };
+}
+
+// ── プレビューからスプレッドシート＋カレンダー両方に保存 ──
+
+function saveToBoth(params) {
+  var sheetResult = saveToSheet(params);
+  var calResult = saveToCalendar(params);
+
+  return {
+    success: sheetResult.success && calResult.success,
+    message: sheetResult.message + '\n\n' + calResult.message
+  };
+}
+
+// ── サイドバーから呼ばれるブリッジ関数（後方互換） ──
 
 function processSchedule(params) {
   var scheduleData = generateScheduleData(
@@ -744,7 +963,7 @@ function processSchedule(params) {
     params.differAxis || '',
     params.selectedPhases || []
   );
-  
+
   return writeScheduleToSheet(
     params.taskInput,
     params.trueGoal,
