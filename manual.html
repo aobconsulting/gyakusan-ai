@@ -671,12 +671,43 @@
 
             <strong>すでにキーがある場合：</strong><br>
             画面にキーが一覧表示されています。<strong>新しく作り直す必要はありません。</strong><br>
-            キーの右にあるコピーアイコンをクリックして、メモ帳などに貼り付けておきます。
-            <div class="step-img-hint">
-              <span>✅</span> <span>キーは <code>AIza...</code> で始まる長い文字列です</span>
+
+            <!-- 図解：AI Studio キー一覧画面 -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;">
+              <div style="font-weight:700;color:var(--accent);margin-bottom:12px;">📌 Google AI Studio のキー一覧画面</div>
+              <svg viewBox="0 0 540 250" style="width:100%;max-width:540px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <rect x="10" y="10" width="520" height="230" rx="10" fill="#1c2330" stroke="#30363d"/>
+                <text x="30" y="38" fill="#8b949e" font-size="13" font-family="sans-serif">API keys</text>
+                <!-- Key row -->
+                <rect x="30" y="52" width="480" height="44" rx="8" fill="#0d1117" stroke="#30363d"/>
+                <!-- Key text (truncated) -->
+                <text x="48" y="80" fill="#38bdf8" font-size="13" font-family="monospace" text-decoration="underline">AIzaSyB●●●●●●●●</text>
+                <!-- Copy icon -->
+                <rect x="430" y="62" width="28" height="24" rx="4" fill="#1e3a5f" stroke="#3b82f6"/>
+                <text x="437" y="80" fill="#60a5fa" font-size="13" font-family="sans-serif">📋</text>
+                <!-- Step 1 annotation -->
+                <line x1="130" y1="96" x2="130" y2="118" stroke="#f97316" stroke-width="2" marker-end="url(#arrK1)"/>
+                <rect x="20" y="122" width="250" height="48" rx="8" fill="rgba(249,115,22,0.12)" stroke="#f97316" stroke-dasharray="4"/>
+                <text x="34" y="142" fill="#f97316" font-size="12" font-weight="bold" font-family="sans-serif">方法❶ キー名をクリック</text>
+                <text x="34" y="160" fill="#f97316" font-size="11" font-family="sans-serif">→ 詳細パネルが開き全文が表示される</text>
+                <!-- Step 2 annotation -->
+                <line x1="444" y1="86" x2="444" y2="118" stroke="#34d399" stroke-width="2" marker-end="url(#arrK2)"/>
+                <rect x="290" y="122" width="220" height="48" rx="8" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-dasharray="4"/>
+                <text x="304" y="142" fill="#34d399" font-size="12" font-weight="bold" font-family="sans-serif">方法❷ 📋アイコンをクリック</text>
+                <text x="304" y="160" fill="#34d399" font-size="11" font-family="sans-serif">→ 全文が直接コピーされる</text>
+                <!-- Note -->
+                <rect x="30" y="184" width="480" height="42" rx="8" fill="rgba(249,115,22,0.08)" stroke="#f97316" stroke-dasharray="3"/>
+                <text x="48" y="202" fill="#f97316" font-size="12" font-weight="bold" font-family="sans-serif">⚠️ 一覧ではキーが省略表示されています（途中が●●●で隠れている）</text>
+                <text x="62" y="218" fill="#8b949e" font-size="11" font-family="sans-serif">省略されたまま手動コピーしないよう注意！ 必ず上の❶か❷の方法で取得してください</text>
+                <defs>
+                  <marker id="arrK1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#f97316"/></marker>
+                  <marker id="arrK2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#34d399"/></marker>
+                </defs>
+              </svg>
             </div>
 
-            <br><strong>初めての場合：</strong><br>
+            <strong>初めての場合：</strong><br>
             「APIキーを作成」ボタンをクリック → プロジェクト選択画面が出たら<br>
             <strong>デフォルトの「Generative Language Client」のままでOK</strong>。<br>
             新しくプロジェクトを作る必要はありません。→「キーを作成」をクリック。<br>
@@ -850,9 +881,11 @@
             <span class="url-box">https://aistudio.google.com/apikey</span>
 
             <strong>すでにキーがある場合：</strong><br>
-            画面にキーが一覧表示されています。コピーアイコンをクリックしてメモ帳に貼り付けておきます。
-            <div class="step-img-hint">
-              <span>✅</span> <span>キーは <code>AIza...</code> で始まる長い文字列です</span>
+            画面にキーが一覧表示されています。<strong>新しく作り直す必要はありません。</strong><br>
+            一覧ではキーが省略表示（途中が●●●で隠れた状態）になっています。
+            <div class="callout callout-warn" style="margin-top:8px; margin-bottom:8px;">
+              <span class="callout-icon">⚠️</span>
+              <span><strong>キー名をクリック</strong>して詳細パネルで全文を確認するか、右の<strong>📋アイコン</strong>で全文をコピーしてください。<br>省略表示のまま手動コピーしないよう注意！</span>
             </div>
 
             <br><strong>初めての場合：</strong><br>
@@ -960,7 +993,8 @@
 
             <strong>① 自分のAPIキーを取得する</strong><br>
             <span class="url-box">https://aistudio.google.com/apikey</span>
-            キーをコピーしてメモ帳に貼り付けておきます。<br><br>
+            すでにキーがある場合、一覧ではキーが省略表示（途中が●●●で隠れた状態）になっています。<br>
+            <strong>キー名をクリック</strong>して詳細パネルで全文を確認するか、右の<strong>📋アイコン</strong>で全文をコピーしてメモ帳に貼り付けておきます。<br><br>
 
             <strong>② スプレッドシートのコピーを作成する</strong><br>
             管理者から元のスプレッドシートを共有してもらい、
