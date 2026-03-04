@@ -732,9 +732,9 @@
         <input type="text" class="chat-input" id="chatInput" placeholder="回答を入力..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="send-btn" onclick="sendMessage()" id="sendBtn">送信</button>
       </div>
-      <div style="display:flex; gap:8px; margin-top:6px;">
-        <button class="skip-btn" onclick="skipToDate()" style="flex:1;">⏭ スキップして日程設定へ</button>
-        <button class="skip-btn" onclick="resetAll()" style="flex:0 0 auto; background:rgba(100,116,139,0.08); color:var(--text-dim);">↩ 最初に戻る</button>
+      <div style="display:flex; gap:6px; margin-top:6px;">
+        <button class="skip-btn" onclick="skipToDate()" style="flex:1; padding:6px; font-size:13px;">⏭ スキップ</button>
+        <button class="skip-btn" onclick="resetAll()" style="flex:0 0 auto; padding:6px 10px; font-size:13px;">↩ 戻る</button>
       </div>
     </div>
   </div>
@@ -1024,7 +1024,7 @@ function goToDateStep() {
   document.getElementById('goalTitle').value = trueGoal;
   
   // Show phase selection for business plan tasks
-  var isBizPlan = !isPrivate && /事業計画|新サービス|起業|新規事業|ローンチ|リリース|立ち上げ|ブランド|PR|マーケ|集客/.test(taskInput + trueGoal);
+  var isBizPlan = !isPrivate && /事業計画|事業計画書|新サービス|起業|新規事業|ローンチ|リリース|立ち上げ|ブランド|PR|マーケ|集客|サービス|収益|売上|ビジネス|法人|開業|創業/.test(taskInput + ' ' + trueGoal);
   document.getElementById('phaseSelection').classList.toggle('hidden', !isBizPlan);
 }
 
