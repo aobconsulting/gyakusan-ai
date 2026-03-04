@@ -531,15 +531,26 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
 
 function writeScheduleToSheet(taskInput, trueGoal, goalLevel, goalDateStr, goalTime, scheduleData, isPrivate) {
   var ss = getSpreadsheet();
-  var sheetName = '逆算スケジュール';
-  var sheet = ss.getSheetByName(sheetName);
-  
-  if (!sheet) {
-    sheet = ss.insertSheet(sheetName);
-  } else {
-    sheet.clear();
+
+  // シート名を生成: タスク名(10文字)_ユーザー名_MMdd_HHmm
+  var now = new Date();
+  var taskShort = taskInput.replace(/[\s　]/g, '').substring(0, 10);
+  var timestamp = Utilities.formatDate(now, 'Asia/Tokyo', 'MMdd_HHmm');
+  var email = Session.getActiveUser().getEmail();
+  var userName = '';
+  if (email) {
+    // メールアドレスからユーザー名部分を取得（@の前）
+    var localPart = email.split('@')[0];
+    // 組織利用（複数ユーザー）の場合のみ名前を付与
+    var editors = ss.getEditors();
+    var viewers = ss.getViewers();
+    if (editors.length + viewers.length > 1) {
+      userName = '_' + localPart;
+    }
   }
-  
+  var sheetName = taskShort + userName + '_' + timestamp;
+  var sheet = ss.insertSheet(sheetName);
+
   var goalDate = new Date(goalDateStr);
   
   // ── ヘッダー情報 ──
