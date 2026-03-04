@@ -39,22 +39,17 @@ function getSpreadsheet() {
   throw new Error('スプレッドシートが見つかりません。一度スプレッドシートを開いてメニューを表示させてください。');
 }
 
-// ウェブアプリとしてHTMLを返す（?page=manual でマニュアル表示）
-function doGet(e) {
-  var page = (e && e.parameter && e.parameter.page === 'manual') ? 'manual' : 'ui';
-  var title = page === 'manual' ? '📖 逆算AI 使い方ガイド' : '🧭 逆算AI';
-  if (page === 'ui') {
-    var tmpl = HtmlService.createTemplateFromFile('ui');
-    tmpl.manualUrl = (ScriptApp.getService().getUrl() || '') + '?page=manual';
-    return tmpl.evaluate()
-      .setTitle(title)
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-  }
-  return HtmlService.createHtmlOutputFromFile(page)
-    .setTitle(title)
+// ウェブアプリとしてHTMLを返す
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('ui')
+    .setTitle('🧭 逆算AI')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// マニュアルHTMLを返す（ui.html内のiframeで表示）
+function getManualHtml() {
+  return HtmlService.createHtmlOutputFromFile('manual').getContent();
 }
 
 // メニューからウェブアプリを別タブで開く
