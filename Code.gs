@@ -157,9 +157,9 @@ function callGemini(messages, systemPrompt) {
   if (!apiKey) {
     return '⚠️ Gemini APIキーが設定されていません。メニュー「逆算AI」→「初期設定」からAPIキーを設定してください。';
   }
-  
+
   var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey;
-  
+
   // Gemini API形式に変換
   var contents = [];
   for (var i = 0; i < messages.length; i++) {
@@ -168,7 +168,7 @@ function callGemini(messages, systemPrompt) {
       parts: [{ text: messages[i].content }]
     });
   }
-  
+
   var payload = {
     contents: contents,
     systemInstruction: {
@@ -179,27 +179,45 @@ function callGemini(messages, systemPrompt) {
       maxOutputTokens: 2048
     }
   };
-  
-  try {
-    var options = {
-      method: 'post',
-      contentType: 'application/json',
-      payload: JSON.stringify(payload),
-      muteHttpExceptions: true
-    };
-    
-    var response = UrlFetchApp.fetch(url, options);
-    var json = JSON.parse(response.getContentText());
-    
-    if (json.candidates && json.candidates[0] && json.candidates[0].content) {
-      return json.candidates[0].content.parts[0].text;
-    } else if (json.error) {
-      return '⚠️ APIエラー: ' + json.error.message;
+
+  var options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  // レート制限時は最大3回リトライ（10秒間隔）
+  var maxRetries = 3;
+  for (var attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      var response = UrlFetchApp.fetch(url, options);
+      var json = JSON.parse(response.getContentText());
+
+      if (json.candidates && json.candidates[0] && json.candidates[0].content) {
+        return json.candidates[0].content.parts[0].text;
+      } else if (json.error) {
+        // レート制限エラー（429）の場合はリトライ
+        var msg = json.error.message || '';
+        if ((json.error.code === 429 || msg.indexOf('quota') !== -1 || msg.indexOf('rate') !== -1) && attempt < maxRetries) {
+          Utilities.sleep(10000); // 10秒待機
+          continue;
+        }
+        if (json.error.code === 429 || msg.indexOf('quota') !== -1) {
+          return '⚠️ APIの利用制限に達しました。少し時間をおいて（30秒ほど）から再度お試しください。\n（Gemini API無料枠: 約10リクエスト/分）';
+        }
+        return '⚠️ APIエラー: ' + msg;
+      }
+      return '⚠️ 予期しない応答形式です。APIキーを確認してください。';
+    } catch (e) {
+      if (attempt < maxRetries) {
+        Utilities.sleep(10000);
+        continue;
+      }
+      return '⚠️ 通信エラー: ' + e.message;
     }
-    return '⚠️ 予期しない応答形式です。APIキーを確認してください。';
-  } catch (e) {
-    return '⚠️ 通信エラー: ' + e.message;
   }
+  return '⚠️ APIの利用制限に達しました。少し時間をおいてから再度お試しください。';
 }
 
 // ── AIヒアリング（ゴール特定 + 抽象度引き上げ + ストーリー・ミッション抽出） ──
