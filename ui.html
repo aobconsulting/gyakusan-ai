@@ -639,7 +639,7 @@
 
 <!-- Steps -->
 <div class="steps" id="stepsBar">
-  <div class="step-item active" id="si0"><div class="step-num">1</div><span>入力</span></div>
+  <div class="step-item active" id="si0" onclick="resetAll()" style="cursor:pointer;" title="最初に戻る"><div class="step-num">1</div><span>入力</span></div>
   <div class="step-arrow">›</div>
   <div class="step-item" id="si1"><div class="step-num">2</div><span>対話</span></div>
   <div class="step-arrow">›</div>
@@ -1095,18 +1095,30 @@ function setLoading(show) {
 }
 
 // ── Manual ──
+var webAppUrl = '';
 function openManual() {
-  google.script.run
-    .withSuccessHandler(function(url) {
-      if (url) window.open(url + '?page=manual', '_blank');
-    })
-    .getWebAppUrl();
+  if (webAppUrl) {
+    window.open(webAppUrl + '?page=manual', '_blank');
+  }
 }
 
 // ── Init ──
 function init() {
   goToStep(0);
   renderSamples();
+  // ウェブアプリURLを取得して使い方リンクを有効化
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    google.script.run
+      .withSuccessHandler(function(url) {
+        webAppUrl = url || '';
+        if (webAppUrl) {
+          var link = document.getElementById('guideLink');
+          link.href = webAppUrl + '?page=manual';
+          link.target = '_blank';
+        }
+      })
+      .getWebAppUrl();
+  }
 }
 
 init();
