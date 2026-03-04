@@ -41,7 +41,7 @@ function getSpreadsheet() {
 
 // ウェブアプリとしてHTMLを返す（?page=manual でマニュアル表示）
 function doGet(e) {
-  var page = (e && e.parameter && e.parameter.page === 'manual') ? 'manual' : 'sidebar';
+  var page = (e && e.parameter && e.parameter.page === 'manual') ? 'manual' : 'ui';
   var title = page === 'manual' ? '📖 逆算AI 使い方ガイド' : '🧭 逆算AI';
   return HtmlService.createHtmlOutputFromFile(page)
     .setTitle(title)
