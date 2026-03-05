@@ -177,6 +177,11 @@ function callGemini(messages, systemPrompt) {
     generationConfig: {
       temperature: 0.7,
       maxOutputTokens: 2048
+    },
+    // thinking無効化: gemini-2.5-flashはデフォルトでthinkingがONのため
+    // 無料枠のトークン消費が激増する。会話用途では不要なので0に固定。
+    thinkingConfig: {
+      thinkingBudget: 0
     }
   };
 
@@ -187,37 +192,44 @@ function callGemini(messages, systemPrompt) {
     muteHttpExceptions: true
   };
 
-  // レート制限時は最大3回リトライ（10秒間隔）
+  // 429時は最大3回リトライ（15秒間隔）
   var maxRetries = 3;
   for (var attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       var response = UrlFetchApp.fetch(url, options);
+      var httpCode = response.getResponseCode();
       var json = JSON.parse(response.getContentText());
 
       if (json.candidates && json.candidates[0] && json.candidates[0].content) {
         return json.candidates[0].content.parts[0].text;
-      } else if (json.error) {
-        // レート制限エラー（429）の場合はリトライ
-        var msg = json.error.message || '';
-        if ((json.error.code === 429 || msg.indexOf('quota') !== -1 || msg.indexOf('rate') !== -1) && attempt < maxRetries) {
-          Utilities.sleep(10000); // 10秒待機
+      }
+
+      var msg = (json.error && json.error.message) ? json.error.message : '';
+      if (httpCode === 429 || msg.indexOf('RESOURCE_EXHAUSTED') !== -1) {
+        if (attempt < maxRetries) {
+          Utilities.sleep(15000); // 15秒待ってリトライ
           continue;
         }
-        if (json.error.code === 429 || msg.indexOf('quota') !== -1) {
-          return '⚠️ APIの利用制限に達しました。少し時間をおいて（30秒ほど）から再度お試しください。\n（Gemini API無料枠: 約10リクエスト/分）';
-        }
+        var detail = msg.match(/limit: (\d+)/);
+        var retryIn = msg.match(/retry in ([\d.]+)s/i);
+        var info = detail ? '（制限: ' + detail[1] + '回/分' : '';
+        if (retryIn) info += '、あと約' + Math.ceil(parseFloat(retryIn[1])) + '秒';
+        if (info) info += '）';
+        return '⚠️ APIが混み合っています。少し待ってから再度送信してください。' + info;
+      }
+      if (json.error) {
         return '⚠️ APIエラー: ' + msg;
       }
       return '⚠️ 予期しない応答形式です。APIキーを確認してください。';
     } catch (e) {
       if (attempt < maxRetries) {
-        Utilities.sleep(10000);
+        Utilities.sleep(15000);
         continue;
       }
       return '⚠️ 通信エラー: ' + e.message;
     }
   }
-  return '⚠️ APIの利用制限に達しました。少し時間をおいてから再度お試しください。';
+  return '⚠️ APIが混み合っています。しばらく待ってから再度お試しください。';
 }
 
 // ── AIヒアリング（ゴール特定 + 抽象度引き上げ + ストーリー・ミッション抽出） ──
@@ -322,7 +334,7 @@ function continueHearing(chatHistory, taskInput) {
     '   ○○は：価格/商品力/アクセス/サービス/経験価値 のいずれか\n' +
     '5. ★★★ 質問は必ず1つだけ。絶対に2つ以上の質問を同時にしない。1回の返答に「？」は1つだけ。 ★★★\n' +
     '6. 簡潔に。長文禁止。フレームワーク名や専門用語は使わない。';
-  
+
   var messages = [];
   for (var i = 0; i < chatHistory.length; i++) {
     messages.push({
@@ -330,7 +342,7 @@ function continueHearing(chatHistory, taskInput) {
       content: chatHistory[i].content
     });
   }
-  
+
   return callGemini(messages, systemPrompt);
 }
 
@@ -366,7 +378,7 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
   if (isBizPlan) {
     bizPlanPhases = '\n\n■ ユーザーが選択したフェーズのみでマイルストーンを組むこと\n';
     var phaseNum = 1;
-    
+
     // Phase: 原点整理
     if (selectedPhases.indexOf('origin') >= 0) {
       bizPlanPhases += '\nPhase ' + phaseNum + ': 原点整理（1-2マイルストーン）\n' +
@@ -375,7 +387,7 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
         '  ※ ここが曖昧だと後のフェーズが全てブレる。最重要フェーズ。\n';
       phaseNum++;
     }
-    
+
     // Phase: コンセプト設計
     if (selectedPhases.indexOf('concept') >= 0) {
       bizPlanPhases += '\nPhase ' + phaseNum + ': コンセプト設計（2-3マイルストーン）\n';
@@ -401,7 +413,7 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
       }
       phaseNum++;
     }
-    
+
     // Phase: 強みのポジショニング
     if (selectedPhases.indexOf('positioning') >= 0) {
       bizPlanPhases += '\nPhase ' + phaseNum + ': 強みのポジショニング（1-2マイルストーン）\n' +
@@ -412,8 +424,8 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
         '  ※ フレームワーク名はタスクに書かない。「自社の強み分析」「競合調査」等の自然な名前で。\n';
       phaseNum++;
     }
-    
-    // Phase: ブランド設計（新規追加）
+
+    // Phase: ブランド設計
     if (selectedPhases.indexOf('brand') >= 0) {
       bizPlanPhases += '\nPhase ' + phaseNum + ': ブランド設計（2-3マイルストーン）\n' +
         '  以下の6つのステップを踏んでブランドの核を作る：\n' +
@@ -428,7 +440,7 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
         '  AIプロンプトで「お客様にどんな気持ちになってほしいか」「利用者がどう変わるか」等を引き出す。\n';
       phaseNum++;
     }
-    
+
     // Phase: 検証・実行
     if (selectedPhases.indexOf('validate') >= 0) {
       bizPlanPhases += '\nPhase ' + phaseNum + ': 検証・実行（2-3マイルストーン）\n' +
@@ -439,8 +451,8 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
         '  ※ 新しい事業は成功率5%。一発で決まらないのが普通。「一勝九敗」の精神で。\n';
       phaseNum++;
     }
-    
-    // Phase: 認知拡大・SNS戦略（新規追加）
+
+    // Phase: 認知拡大・SNS戦略
     if (selectedPhases.indexOf('awareness') >= 0) {
       bizPlanPhases += '\nPhase ' + phaseNum + ': 認知拡大・SNS戦略（2-3マイルストーン）\n' +
         '  - 認知→体験→購買の各段階で「共感・拡散」が起きる設計を意識\n' +
@@ -505,7 +517,7 @@ function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalT
   }];
   
   var reply = callGemini(messages, systemPrompt);
-  
+
   try {
     var cleaned = reply.replace(/```json?|```/g, '').trim();
     var parsed = JSON.parse(cleaned);
@@ -942,9 +954,17 @@ function saveToCalendar(params) {
     var desc = item.description || '';
     if (item.aiPrompt) desc += '\n\n💡 AIプロンプト:\n' + item.aiPrompt;
 
-    calendar.createEvent('【逆算AI】' + item.title, startDate, endDate, {
+    var event = calendar.createEvent('【逆算AI】' + item.title, startDate, endDate, {
       description: desc
     });
+
+    // リマインダー設定: 参集系のみカスタム、その他はカレンダーのデフォルトを維持
+    var cat = (item.category || '').toLowerCase();
+    if (cat === 'meeting' || cat === 'booking') {
+      event.removeAllReminders();
+      event.addPopupReminder(10080); // 1回目: 1週間前 (7日×24時間×60分)
+      event.addPopupReminder(30);    // 2回目: 30分前（デフォルト相当）
+    }
     count++;
   }
 

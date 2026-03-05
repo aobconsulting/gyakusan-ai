@@ -335,7 +335,17 @@
     transition: all 0.2s;
   }
   .skip-btn:hover { border-color: var(--primary); color: var(--primary); }
-  
+
+  .hearing-counter {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    padding: 4px 0;
+    letter-spacing: 0.5px;
+  }
+  .hearing-counter span { font-weight: 700; color: var(--primary); }
+
   /* ── Goal Badge ── */
   .goal-badge {
     background: var(--primary-light);
@@ -823,6 +833,7 @@
   <div class="chat-container">
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area hidden" id="chatInputArea">
+      <div id="hearingCounter" class="hearing-counter">残り <span id="hearingRemain">5</span> / 5 回</div>
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chatInput" placeholder="回答を入力..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="send-btn" onclick="sendMessage()" id="sendBtn">送信</button>
@@ -957,6 +968,8 @@ var dominateAxis = '';
 var differAxis = '';
 var isLoading = false;
 var schedulePreviewData = [];
+var hearingCount = 0;
+var maxHearingQuestions = 5;
 
 // ── Sample Data ──
 var bizSamples = [
@@ -1037,57 +1050,96 @@ function setType(priv) {
 function startHearing() {
   taskInput = document.getElementById('taskInput').value.trim();
   if (!taskInput) return;
-  
+
+  // 連打防止
+  var btn = document.getElementById('startBtn');
+  if (btn.disabled) return;
+  btn.disabled = true;
+
   goToStep(1);
   addChatMessage('user', taskInput, true);
-  setLoading(true);
-  
-  google.script.run
-    .withSuccessHandler(function(reply) {
-      chatHistory = [
-        { role: 'user', content: 'やるべきタスク：「' + taskInput + '」' },
-        { role: 'model', content: reply }
-      ];
-      addChatMessage('assistant', reply);
-      setLoading(false);
-      if (!checkGoalConfirmed(reply)) {
-        showQuickReply();
-      }
-    })
-    .withFailureHandler(function(err) {
-      var msg = err.message || '';
-      if (msg.indexOf('GEMINI_API_KEY') !== -1 || msg.indexOf('quota') !== -1 || msg.indexOf('API key') !== -1) {
-        document.getElementById('apiErrorBanner').classList.add('visible');
-      }
-      addChatMessage('assistant', '⚠️ エラーが発生しました: ' + msg);
-      setLoading(false);
-    })
-    .startGoalHearing(taskInput);
+
+  // テンプレート応答（API不要・即座に表示）
+  var reply = '「' + taskInput + '」ですね！\nゴールの解像度を上げるためにいくつか質問させてください。よろしいですか？';
+  chatHistory = [
+    { role: 'user', content: 'やるべきタスク：「' + taskInput + '」' },
+    { role: 'assistant', content: reply }
+  ];
+  setTimeout(function() {
+    addChatMessage('assistant', reply);
+    showQuickReply();
+  }, 300);
 }
 
 // ── Send Message ──
+var _lastUserText = '';
+
 function sendMessage() {
   var input = document.getElementById('chatInput');
   var text = input.value.trim();
   if (!text || isLoading) return;
-  
+
+  _lastUserText = text;
   input.value = '';
   addChatMessage('user', text);
   chatHistory.push({ role: 'user', content: text });
   setLoading(true);
-  
+
+  _callHearing();
+}
+
+function _callHearing() {
   google.script.run
     .withSuccessHandler(function(reply) {
-      chatHistory.push({ role: 'model', content: reply });
-      addChatMessage('assistant', reply);
-      setLoading(false);
-      checkGoalConfirmed(reply);
+      if (reply.indexOf('⚠️') !== 0) {
+        hearingCount++;
+        updateHearingCounter();
+        chatHistory.push({ role: 'assistant', content: reply });
+        addChatMessage('assistant', reply);
+        setLoading(false);
+        checkGoalConfirmed(reply);
+      } else {
+        chatHistory.pop();
+        addChatMessage('assistant', reply);
+        _showRetryButton();
+        setLoading(false);
+      }
     })
     .withFailureHandler(function(err) {
+      chatHistory.pop();
       addChatMessage('assistant', '⚠️ エラー: ' + err.message);
+      _showRetryButton();
       setLoading(false);
     })
     .continueHearing(chatHistory, taskInput);
+}
+
+function _showRetryButton() {
+  var container = document.getElementById('chatMessages');
+  var lastBubble = container.querySelector('.msg.assistant:last-child .msg-bubble');
+  if (!lastBubble) return;
+  var btn = document.createElement('button');
+  btn.className = 'quick-reply-btn quick-reply-yes';
+  btn.style.marginTop = '8px';
+  btn.textContent = '🔄 再送信';
+  btn.onclick = retryHearing;
+  lastBubble.appendChild(btn);
+}
+
+function retryHearing() {
+  if (isLoading) return;
+  addChatMessage('user', _lastUserText);
+  chatHistory.push({ role: 'user', content: _lastUserText });
+  setLoading(true);
+  _callHearing();
+}
+
+function updateHearingCounter() {
+  var remain = Math.max(0, maxHearingQuestions - hearingCount);
+  var el = document.getElementById('hearingRemain');
+  if (el) el.textContent = remain;
+  var counter = document.getElementById('hearingCounter');
+  if (counter) counter.style.color = remain <= 1 ? '#EF4444' : '';
 }
 
 function checkGoalConfirmed(reply) {
@@ -1132,25 +1184,16 @@ function showQuickReply() {
 }
 
 function quickReplyYes() {
+  if (isLoading) return; // 連打防止
   var qr = document.getElementById('quickReply');
   if (qr) qr.remove();
   document.getElementById('chatInputArea').classList.remove('hidden');
   document.getElementById('chatInput').focus();
-  addChatMessage('user', 'はい、お願いします');
-  chatHistory.push({ role: 'user', content: 'はい、お願いします' });
+  _lastUserText = 'はい、お願いします';
+  addChatMessage('user', _lastUserText);
+  chatHistory.push({ role: 'user', content: _lastUserText });
   setLoading(true);
-  google.script.run
-    .withSuccessHandler(function(reply) {
-      chatHistory.push({ role: 'model', content: reply });
-      addChatMessage('assistant', reply);
-      setLoading(false);
-      checkGoalConfirmed(reply);
-    })
-    .withFailureHandler(function(err) {
-      addChatMessage('assistant', '⚠️ エラー: ' + err.message);
-      setLoading(false);
-    })
-    .continueHearing(chatHistory, taskInput);
+  _callHearing();
 }
 
 function quickReplyNo() {
@@ -1304,9 +1347,12 @@ function resetAll() {
   dominateAxis = '';
   differAxis = '';
   schedulePreviewData = [];
+  hearingCount = 0;
+  updateHearingCounter();
   document.getElementById('taskInput').value = '';
   document.getElementById('chatMessages').innerHTML = '';
   document.getElementById('chatInputArea').classList.add('hidden');
+  document.getElementById('startBtn').disabled = false;
   goToStep(0);
 }
 
@@ -1347,13 +1393,17 @@ function setLoading(show) {
   }
 }
 
-// ── Manual (別タブで開く) ──
+// ── Manual (別タブで開く・キャッシュ付き) ──
+var _manualHtmlCache = null;
 function openManualTab() {
-  var url = window.location.href;
-  // GASウェブアプリURLの末尾を /dev や /exec として manual ページ用パラメータ付きで開く
-  // 実際にはGAS側で別ルートは作れないので、getManualHtml の結果を Blob URL で別タブに表示
+  if (_manualHtmlCache) {
+    var w = window.open('', '_blank');
+    if (w) { w.document.write(_manualHtmlCache); w.document.close(); }
+    return;
+  }
   google.script.run
     .withSuccessHandler(function(html) {
+      _manualHtmlCache = html;
       var w = window.open('', '_blank');
       if (w) { w.document.write(html); w.document.close(); }
     })
