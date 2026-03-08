@@ -176,12 +176,8 @@ function callGemini(messages, systemPrompt) {
     },
     generationConfig: {
       temperature: 0.7,
-      maxOutputTokens: 2048
-    },
-    // thinking無効化: gemini-2.5-flashはデフォルトでthinkingがONのため
-    // 無料枠のトークン消費が激増する。会話用途では不要なので0に固定。
-    thinkingConfig: {
-      thinkingBudget: 0
+      maxOutputTokens: 2048,
+      thinkingConfig: { thinkingBudget: 0 }
     }
   };
 
@@ -192,44 +188,31 @@ function callGemini(messages, systemPrompt) {
     muteHttpExceptions: true
   };
 
-  // 429時は最大3回リトライ（15秒間隔）
-  var maxRetries = 3;
-  for (var attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      var response = UrlFetchApp.fetch(url, options);
-      var httpCode = response.getResponseCode();
-      var json = JSON.parse(response.getContentText());
+  try {
+    var response = UrlFetchApp.fetch(url, options);
+    var httpCode = response.getResponseCode();
+    var json = JSON.parse(response.getContentText());
 
-      if (json.candidates && json.candidates[0] && json.candidates[0].content) {
-        return json.candidates[0].content.parts[0].text;
-      }
-
-      var msg = (json.error && json.error.message) ? json.error.message : '';
-      if (httpCode === 429 || msg.indexOf('RESOURCE_EXHAUSTED') !== -1) {
-        if (attempt < maxRetries) {
-          Utilities.sleep(15000); // 15秒待ってリトライ
-          continue;
-        }
-        var detail = msg.match(/limit: (\d+)/);
-        var retryIn = msg.match(/retry in ([\d.]+)s/i);
-        var info = detail ? '（制限: ' + detail[1] + '回/分' : '';
-        if (retryIn) info += '、あと約' + Math.ceil(parseFloat(retryIn[1])) + '秒';
-        if (info) info += '）';
-        return '⚠️ APIが混み合っています。少し待ってから再度送信してください。' + info;
-      }
-      if (json.error) {
-        return '⚠️ APIエラー: ' + msg;
-      }
-      return '⚠️ 予期しない応答形式です。APIキーを確認してください。';
-    } catch (e) {
-      if (attempt < maxRetries) {
-        Utilities.sleep(15000);
-        continue;
-      }
-      return '⚠️ 通信エラー: ' + e.message;
+    if (json.candidates && json.candidates[0] && json.candidates[0].content) {
+      return json.candidates[0].content.parts[0].text;
     }
+
+    var msg = (json.error && json.error.message) ? json.error.message : '';
+    if (httpCode === 429 || msg.indexOf('RESOURCE_EXHAUSTED') !== -1) {
+      var detail = msg.match(/limit: (\d+)/);
+      var retryIn = msg.match(/retry in ([\d.]+)s/i);
+      var info = detail ? '（制限: ' + detail[1] + '回/分' : '';
+      if (retryIn) info += '、あと約' + Math.ceil(parseFloat(retryIn[1])) + '秒';
+      if (info) info += '）';
+      return '⚠️ APIが混み合っています。少し待ってから再度送信してください。' + info;
+    }
+    if (json.error) {
+      return '⚠️ APIエラー: ' + msg;
+    }
+    return '⚠️ 予期しない応答形式です。APIキーを確認してください。';
+  } catch (e) {
+    return '⚠️ 通信エラー: ' + e.message;
   }
-  return '⚠️ APIが混み合っています。しばらく待ってから再度お試しください。';
 }
 
 // ── AIヒアリング（ゴール特定 + 抽象度引き上げ + ストーリー・ミッション抽出） ──
@@ -242,15 +225,15 @@ function startGoalHearing(taskInput) {
     'ユーザーは多くの場合、中間タスクを最終ゴールと勘違いしています。\n' +
     '抽象度を段階的に引き上げてください：\n' +
     '例1（ビジネス）：\n' +
-    '  Lv1 事業計画書を作成する（入力されたタスク）\n' +
-    '  Lv2 銀行から融資を取り付ける（直接の目的）\n' +
-    '  Lv3 新サービスをローンチして収益を得る（上位目的）\n' +
-    '  Lv4 サービスを届けたお客様が幸せになる（究極目的＝ミッション）\n\n' +
+    '  📌 今すぐのゴール: 事業計画書を作成する\n' +
+    '  🎯 その先のゴール: 銀行から融資を取り付ける\n' +
+    '  🌟 大きなゴール: 新サービスをローンチして収益を得る\n' +
+    '  🚀 根本のゴール: サービスを届けたお客様が幸せになる\n\n' +
     '例2（プライベート）：\n' +
-    '  Lv1 旅行の計画を立てる（入力されたタスク）\n' +
-    '  Lv2 結婚記念日を素敵にお祝いする（直接の目的）\n' +
-    '  Lv3 パートナーとの絆を深める（上位目的）\n' +
-    '  Lv4 家族みんなが幸せを感じる（究極目的＝ミッション）\n\n' +
+    '  📌 今すぐのゴール: 旅行の計画を立てる\n' +
+    '  🎯 その先のゴール: 結婚記念日を素敵にお祝いする\n' +
+    '  🌟 大きなゴール: パートナーとの絆を深める\n' +
+    '  🚀 根本のゴール: 家族みんなが幸せを感じる\n\n' +
 
     '■ ビジネスタスクの場合の深掘りアプローチ\n' +
     '事業計画・新サービス・起業系のタスクの場合は、以下も自然に引き出す：\n' +
@@ -286,13 +269,13 @@ function startGoalHearing(taskInput) {
     '2. ユーザーがOKしたら、質問を開始する。\n' +
     '3. ★★★ 質問は必ず1つだけ。絶対に2つ以上の質問を同時にしない。1回の返答に「？」は1つだけ。 ★★★\n' +
     '4. 回答を元に、さらに「その先にある目的」を引き出す（1問ずつ）\n' +
-    '5. 抽象度レベルが見えてきたら、全レベルを提示する：\n' +
-    '   🎯 Lv1: ○○（入力タスク）\n' +
-    '   🎯 Lv2: ○○（直接の目的）\n' +
-    '   🎯 Lv3: ○○（上位目的）\n' +
-    '   🎯 Lv4: ○○（究極目的・あなたのミッション）\n' +
-    '   「今回のゴールはどのレベルに設定しますか？」と聞く\n' +
-    '6. ユーザーがレベルを選んだら：\n' +
+    '5. 目的の広がりが見えてきたら、4つの視点でゴール候補を提示する：\n' +
+    '   📌 今すぐのゴール: ○○（入力タスク）\n' +
+    '   🎯 その先のゴール: ○○（直接の目的）\n' +
+    '   🌟 大きなゴール: ○○（上位目的）\n' +
+    '   🚀 根本のゴール: ○○（あなたのミッション）\n' +
+    '   「今回はどの視点でゴールを設定しますか？」と聞く\n' +
+    '6. ユーザーが視点を選んだら：\n' +
     '   「【ゴール確定】」と書いてから選ばれたゴールを1行で書く。\n' +
     '   その次の行に「【選択レベル】Lv○」と書く。\n' +
     '   ビジネスの場合はその次の行に「【事業タイプ】受託型」or「【事業タイプ】プロダクト型」と書く\n' +
@@ -310,42 +293,117 @@ function startGoalHearing(taskInput) {
   return reply;
 }
 
+// ── ヒアリング（選択肢形式） ──
+// 戻り値: JSON文字列 { question, choices:[{label,text}], isGoalSelect:bool, isDone:bool }
 function continueHearing(chatHistory, taskInput) {
-  var systemPrompt = 'あなたは優秀なプロジェクトマネージャーAIです。ユーザーのタスクの「真のゴール」を段階的に特定中です。\n' +
-    '元のタスク：「' + taskInput + '」\n\n' +
-    '■ ルール\n' +
-    '1. 抽象度を段階的に引き上げる（Lv1→Lv4）\n' +
-    '2. ビジネス系タスクの場合、自然な会話の中で以下も把握する：\n' +
-    '   - 原体験やストーリー（なぜこの事業をやりたいのか）\n' +
-    '   - 事業タイプ（顧客に合わせる受託型 or 自社パッケージのプロダクト型）\n' +
-    '   - 大手が手を出さないニッチな領域を狙えているか\n' +
-    '   - 強みの軸：5つの勝負所（価格/商品力/アクセス/サービス/経験価値）のうち\n' +
-    '     どこで圧倒的に勝つか（支配軸）、どこで差をつけるか（差別化軸）を見極める\n' +
-    '   ※ フレームワーク名は使わず、自然な質問で引き出す\n' +
-    '3. 全レベルが見えたら提示して選択してもらう：\n' +
-    '   🎯 Lv1: ○○（入力タスク）\n' +
-    '   🎯 Lv2: ○○（直接の目的）\n' +
-    '   🎯 Lv3: ○○（上位目的）\n' +
-    '   🎯 Lv4: ○○（究極目的・あなたのミッション）\n' +
-    '4. ユーザーがレベルを選んだら「【ゴール確定】」と書いてゴールを1行で書く\n' +
-    '   次の行に「【選択レベル】Lv○」と書く\n' +
-    '   ビジネスの場合はその次に「【事業タイプ】受託型」or「【事業タイプ】プロダクト型」と書く\n' +
-    '   さらにビジネスの場合「【支配軸】○○」「【差別化軸】○○」と書く（特定できた場合のみ）\n' +
-    '   ○○は：価格/商品力/アクセス/サービス/経験価値 のいずれか\n' +
-    '5. ★★★ 質問は必ず1つだけ。絶対に2つ以上の質問を同時にしない。1回の返答に「？」は1つだけ。 ★★★\n' +
-    '6. 簡潔に。長文禁止。フレームワーク名や専門用語は使わない。';
+  var userTurns = chatHistory.filter(function(m){ return m.role==='user'; }).length;
 
-  var messages = [];
-  for (var i = 0; i < chatHistory.length; i++) {
-    messages.push({
-      role: chatHistory[i].role,
-      content: chatHistory[i].content
-    });
+  // ゴール確定済みの場合（JS側で GOAL_SELECTED: プレフィックスをつけて送信）
+  var lastUser = '';
+  for (var i = chatHistory.length-1; i >= 0; i--) {
+    if (chatHistory[i].role === 'user') { lastUser = chatHistory[i].content; break; }
+  }
+  if (lastUser.indexOf('GOAL_SELECTED:') === 0) {
+    return continueHearingConfirm(chatHistory, taskInput);
   }
 
-  return callGemini(messages, systemPrompt);
+  var systemPrompt =
+    'あなたは優秀なプロジェクトマネージャーAIです。\n' +
+    'タスク「' + taskInput + '」のユーザーの「真のゴール」を引き出します。\n\n' +
+    '# 出力形式（厳守）\n' +
+    'JSON のみ出力。マークダウン・説明文・前置き一切不要。\n' +
+    '{\n' +
+    '  "question": "質問文（短く・自然に）",\n' +
+    '  "choices": [\n' +
+    '    {"label":"A","text":"選択肢A"},\n' +
+    '    {"label":"B","text":"選択肢B"},\n' +
+    '    {"label":"C","text":"選択肢C"},\n' +
+    '    {"label":"D","text":"その他（自由記述）"}\n' +
+    '  ],\n' +
+    '  "isGoalSelect": false\n' +
+    '}\n\n' +
+    '# 進行ルール\n' +
+    '【現在ターン: ' + userTurns + '】\n' +
+    'ターン1: 最も本質的な1つの質問。ビジネス系なら「なぜこの事業をやりたいのか」から始める。\n' +
+    'ターン2以降: 回答から仮説を立て、次の質問を1つ。\n' +
+    'ターン3以降: 十分な情報が集まったら isGoalSelect:true にして\n' +
+    '  4つのゴール視点を A〜D に提示する（Lv表記禁止・絵文字必須）:\n' +
+    '  A:📌今すぐのゴール / B:🎯その先のゴール / C:🌟大きなゴール / D:🚀根本のゴール\n' +
+    '  question は「最もあなたのゴールに近いのはどれですか？」\n\n' +
+    '# 選択肢のコツ\n' +
+    '- タスク名・会話から文脈を推測して的確な選択肢を作る\n' +
+    '- 抽象的すぎず・具体的すぎずのバランス\n' +
+    '- 「その他」は常に D に固定（isGoalSelect:true のときは除く）\n' +
+    '- フレームワーク名・専門用語禁止';
+
+  var messages = chatHistory.map(function(m){ return {role:m.role, content:m.content}; });
+  var raw = callGemini(messages, systemPrompt);
+
+  // ⚠️ レート制限エラーをそのまま返す（JS側でハンドリング）
+  if (raw.indexOf('⚠️') === 0) return raw;
+
+  // JSON抽出（```json ブロック対応）
+  var json = raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+  try {
+    JSON.parse(json); // 検証
+    return json;
+  } catch(e) {
+    // パース失敗時はフォールバック
+    return JSON.stringify({
+      question: 'もう少し教えてください。どんなことを実現したいですか？',
+      choices: [
+        {label:'A', text:'事業・仕事の成果を出したい'},
+        {label:'B', text:'自分自身が成長したい'},
+        {label:'C', text:'周囲や社会に貢献したい'},
+        {label:'D', text:'その他（自由記述）'}
+      ],
+      isGoalSelect: false
+    });
+  }
 }
 
+// ゴールLv選択後の確定処理
+function continueHearingConfirm(chatHistory, taskInput) {
+  var systemPrompt =
+    'タスク「' + taskInput + '」\n' +
+    'ユーザーがゴール視点を選びました。以下を出力してください（JSONのみ、説明不要）:\n' +
+    '{\n' +
+    '  "question": "確定メッセージ（例：「ゴールが確定しました！」。絵文字を使って明るく1行で）",\n' +
+    '  "choices": [],\n' +
+    '  "isGoalSelect": false,\n' +
+    '  "isDone": true,\n' +
+    '  "goalText": "確定したゴールの文章（1行）",\n' +
+    '  "goalLevel": "1〜4の数字のみ",\n' +
+    '  "bizType": "受託型 or プロダクト型 or （ビジネス系でない場合は空文字）",\n' +
+    '  "dominateAxis": "価格/商品力/アクセス/サービス/経験価値 のいずれか（不明なら空）",\n' +
+    '  "differAxis": "価格/商品力/アクセス/サービス/経験価値 のいずれか（不明なら空）"\n' +
+    '}\n' +
+    '会話の文脈から bizType・dominateAxis・differAxis を推測して埋めること。';
+
+  var messages = chatHistory.map(function(m){ return {role:m.role, content:m.content}; });
+  var raw = callGemini(messages, systemPrompt);
+
+  if (raw.indexOf('⚠️') === 0) return raw;
+
+  var json = raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+  try {
+    JSON.parse(json);
+    return json;
+  } catch(e) {
+    // フォールバック
+    var lvMatch = '';
+    for (var i = chatHistory.length-1; i >= 0; i--) {
+      var m = chatHistory[i].content.match(/Lv(\d)/);
+      if (m) { lvMatch = m[1]; break; }
+    }
+    return JSON.stringify({
+      question: 'ゴールが確定しました！', choices:[], isGoalSelect:false, isDone:true,
+      goalText: taskInput, goalLevel: lvMatch||'1', bizType:'', dominateAxis:'', differAxis:''
+    });
+  }
+}
+
+// ── スケジュール生成 ──
 // ── スケジュール生成 ──
 
 function generateScheduleData(taskInput, trueGoal, goalLevel, goalDateStr, goalTime, isPrivate, bizType, dominateAxis, differAxis, selectedPhases) {
@@ -654,10 +712,11 @@ function writeScheduleToSheet(taskInput, trueGoal, goalLevel, goalDateStr, goalT
       item.title,
       item.description,
       item.aiPrompt || '',
-      '☐'
+      false
     ];
     
     sheet.getRange(row, 1, 1, rowData.length).setValues([rowData]);
+    sheet.getRange(row, 9, 1, 1).insertCheckboxes();
     sheet.getRange(row, 1, 1, rowData.length).setBackground(bgColor);
     
     // ゴール行を強調
@@ -788,6 +847,19 @@ function generateScheduleOnly(params) {
     } else {
       itemDate = subtractBusinessDays(goalDate, item.daysBefore);
     }
+    // ゴール日以外のタスクが過去日になっていたら翌営業日以降に繰り上げ
+    if (item.daysBefore !== 0) {
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (itemDate < today) {
+        itemDate = new Date(today);
+        // 今日が営業日でなければ次の営業日へ
+        while (!isBusinessDay(itemDate)) {
+          itemDate.setDate(itemDate.getDate() + 1);
+        }
+      }
+    }
+
     items.push({
       id: i,
       title: item.title,
@@ -883,9 +955,10 @@ function saveToSheet(params) {
       item.title,
       item.description,
       item.aiPrompt || '',
-      '☐'
+      false
     ];
     sheet.getRange(row, 1, 1, rowData.length).setValues([rowData]);
+    sheet.getRange(row, 9, 1, 1).insertCheckboxes();
     sheet.getRange(row, 1, 1, rowData.length).setBackground(bgColor);
     if (item.daysBefore === 0) {
       sheet.getRange(row, 1, 1, rowData.length).setFontWeight('bold').setFontColor('#DC2626');

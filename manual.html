@@ -880,15 +880,39 @@
             以下のURLにアクセスします（Googleアカウントでログイン済みの状態で）。
             <span class="url-box">https://aistudio.google.com/apikey</span>
 
-            <strong>すでにキーがある場合：</strong><br>
-            画面にキーが一覧表示されています。<strong>新しく作り直す必要はありません。</strong><br>
-            一覧ではキーが省略表示（途中が●●●で隠れた状態）になっています。
-            <div class="callout callout-warn" style="margin-top:8px; margin-bottom:8px;">
-              <span class="callout-icon">⚠️</span>
-              <span><strong>キー名をクリック</strong>して詳細パネルで全文を確認するか、右の<strong>📋アイコン</strong>で全文をコピーしてください。<br>省略表示のまま手動コピーしないよう注意！</span>
+            <!-- 図解：AI Studio キー一覧画面 -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;">
+              <div style="font-weight:700;color:var(--accent);margin-bottom:12px;">📌 Google AI Studio のキー一覧画面</div>
+              <svg viewBox="0 0 540 250" style="width:100%;max-width:540px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="520" height="230" rx="10" fill="#1c2330" stroke="#30363d"/>
+                <text x="30" y="38" fill="#8b949e" font-size="13" font-family="sans-serif">API keys</text>
+                <rect x="30" y="52" width="480" height="44" rx="8" fill="#0d1117" stroke="#30363d"/>
+                <text x="48" y="80" fill="#38bdf8" font-size="13" font-family="monospace" text-decoration="underline">AIzaSyB●●●●●●●●</text>
+                <rect x="430" y="62" width="28" height="24" rx="4" fill="#1e3a5f" stroke="#3b82f6"/>
+                <text x="437" y="80" fill="#60a5fa" font-size="13" font-family="sans-serif">📋</text>
+                <line x1="130" y1="96" x2="130" y2="118" stroke="#f97316" stroke-width="2" marker-end="url(#arrKO1)"/>
+                <rect x="20" y="122" width="250" height="48" rx="8" fill="rgba(249,115,22,0.12)" stroke="#f97316" stroke-dasharray="4"/>
+                <text x="34" y="142" fill="#f97316" font-size="12" font-weight="bold" font-family="sans-serif">方法❶ キー名をクリック</text>
+                <text x="34" y="160" fill="#f97316" font-size="11" font-family="sans-serif">→ 詳細パネルが開き全文が表示される</text>
+                <line x1="444" y1="86" x2="444" y2="118" stroke="#34d399" stroke-width="2" marker-end="url(#arrKO2)"/>
+                <rect x="290" y="122" width="220" height="48" rx="8" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-dasharray="4"/>
+                <text x="304" y="142" fill="#34d399" font-size="12" font-weight="bold" font-family="sans-serif">方法❷ 📋アイコンをクリック</text>
+                <text x="304" y="160" fill="#34d399" font-size="11" font-family="sans-serif">→ 全文が直接コピーされる</text>
+                <rect x="30" y="184" width="480" height="42" rx="8" fill="rgba(249,115,22,0.08)" stroke="#f97316" stroke-dasharray="3"/>
+                <text x="48" y="202" fill="#f97316" font-size="12" font-weight="bold" font-family="sans-serif">⚠️ 一覧ではキーが省略表示されています（途中が●●●で隠れている）</text>
+                <text x="62" y="218" fill="#8b949e" font-size="11" font-family="sans-serif">省略されたまま手動コピーしないよう注意！ 必ず上の❶か❷の方法で取得してください</text>
+                <defs>
+                  <marker id="arrKO1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#f97316"/></marker>
+                  <marker id="arrKO2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#34d399"/></marker>
+                </defs>
+              </svg>
             </div>
 
-            <br><strong>初めての場合：</strong><br>
+            <strong>すでにキーがある場合：</strong><br>
+            画面にキーが一覧表示されています。<strong>新しく作り直す必要はありません。</strong><br>
+            上の図の❶または❷の方法でキーの全文を取得してください。<br><br>
+
+            <strong>初めての場合：</strong><br>
             「APIキーを作成」→ プロジェクト選択は<strong>デフォルトの「Generative Language Client」のままでOK</strong> →「キーを作成」。
           </div>
         </div>
@@ -916,18 +940,50 @@
 
             画面を下にスクロールして<strong>「スクリプトプロパティ」</strong>セクションを見つけます。<br><br>
 
+            <!-- 図解：初めての場合 -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;">
+              <div style="font-weight:700;color:var(--accent);margin-bottom:12px;">📌 パターンA：プロパティが何もない場合</div>
+              <svg viewBox="0 0 520 120" style="width:100%;max-width:520px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="500" height="100" rx="10" fill="#1c2330" stroke="#30363d"/>
+                <text x="30" y="38" fill="#8b949e" font-size="13" font-family="sans-serif">スクリプトプロパティ</text>
+                <rect x="30" y="55" width="230" height="38" rx="8" fill="#1e40af" stroke="#3b82f6"/>
+                <text x="70" y="80" fill="white" font-size="13" font-weight="bold" font-family="sans-serif">＋ スクリプトプロパティを追加</text>
+                <line x1="280" y1="74" x2="320" y2="74" stroke="#f97316" stroke-width="2" marker-end="url(#arrO1)"/>
+                <text x="330" y="70" fill="#f97316" font-size="12" font-weight="bold" font-family="sans-serif">ここをクリック</text>
+                <text x="330" y="88" fill="#8b949e" font-size="11" font-family="sans-serif">↓ 入力欄が表示されます</text>
+                <defs><marker id="arrO1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#f97316"/></marker></defs>
+              </svg>
+            </div>
+
             <!-- 図解：すでにキーがある場合 -->
-            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;">
-              <div style="font-weight:700;color:var(--accent2);margin-bottom:8px;">⚠️ すでにプロパティがある場合</div>
-              <div style="color:var(--text);font-size:14px;line-height:1.7;margin-bottom:8px;">
-                値は<strong>●●●で非表示</strong>になっています。<strong>「スクリプトプロパティを編集」</strong>を押すと値が見えるようになります。
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;">
+              <div style="font-weight:700;color:var(--accent2);margin-bottom:12px;">📌 パターンB：すでにプロパティがある場合</div>
+              <div style="color:var(--text);font-size:15px;line-height:1.8;margin-bottom:12px;">
+                すでにキーが設定されている場合、値は<strong>非表示（●●●で隠れている）</strong>になっています。<br>
+                <strong>「スクリプトプロパティを編集」</strong>をクリックすると、値が表示・編集可能になります。
+              </div>
+              <svg viewBox="0 0 520 180" style="width:100%;max-width:520px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="500" height="160" rx="10" fill="#1c2330" stroke="#30363d"/>
+                <text x="30" y="38" fill="#8b949e" font-size="13" font-family="sans-serif">スクリプトプロパティ</text>
+                <rect x="30" y="50" width="200" height="32" rx="6" fill="#0d1117" stroke="#30363d"/>
+                <text x="42" y="72" fill="#e6edf3" font-size="12" font-family="monospace">GEMINI_API_KEY</text>
+                <rect x="240" y="50" width="200" height="32" rx="6" fill="#0d1117" stroke="#30363d"/>
+                <text x="252" y="72" fill="#8b949e" font-size="12" font-family="monospace">●●●●●●●●●●●●</text>
+                <text x="460" y="72" fill="#f97316" font-size="16" font-family="sans-serif">←</text>
+                <rect x="30" y="100" width="220" height="38" rx="8" fill="#065f46" stroke="#34d399"/>
+                <text x="55" y="125" fill="white" font-size="13" font-weight="bold" font-family="sans-serif">✏️ スクリプトプロパティを編集</text>
+                <line x1="270" y1="119" x2="310" y2="119" stroke="#34d399" stroke-width="2" marker-end="url(#arrO2)"/>
+                <text x="320" y="115" fill="#34d399" font-size="12" font-weight="bold" font-family="sans-serif">ここをクリックすると</text>
+                <text x="320" y="133" fill="#34d399" font-size="12" font-family="sans-serif">値が表示・編集可能に</text>
+                <defs><marker id="arrO2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#34d399"/></marker></defs>
+              </svg>
+              <div class="callout callout-warn" style="margin-top:12px;">
+                <span class="callout-icon">⚠️</span>
+                <span>値は普段●●●で非表示です。「スクリプトプロパティを編集」を押さないと中身が見えません。</span>
               </div>
             </div>
 
-            <strong>プロパティがない場合：</strong>「スクリプトプロパティを追加」をクリック。<br>
-            <strong>ある場合：</strong>「スクリプトプロパティを編集」をクリック → 新しい行に追加。<br><br>
-
-            以下の通り入力して<strong>「スクリプトプロパティを保存」</strong>：
+            以下の通り入力して<strong>「スクリプトプロパティを保存」</strong>をクリック：
             <div style="background:var(--bg-body);border-radius:10px;padding:16px;font-family:monospace;margin:12px 0;">
               プロパティ：<strong>GEMINI_API_KEY</strong><br>
               値：<strong>（管理者自身のAPIキーを貼り付け）</strong>
@@ -993,8 +1049,36 @@
 
             <strong>① 自分のAPIキーを取得する</strong><br>
             <span class="url-box">https://aistudio.google.com/apikey</span>
-            すでにキーがある場合、一覧ではキーが省略表示（途中が●●●で隠れた状態）になっています。<br>
-            <strong>キー名をクリック</strong>して詳細パネルで全文を確認するか、右の<strong>📋アイコン</strong>で全文をコピーしてメモ帳に貼り付けておきます。<br><br>
+            <!-- 図解：AI Studio キー一覧画面 -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;">
+              <div style="font-weight:700;color:var(--accent);margin-bottom:12px;">📌 Google AI Studio のキー一覧画面</div>
+              <svg viewBox="0 0 540 250" style="width:100%;max-width:540px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="520" height="230" rx="10" fill="#1c2330" stroke="#30363d"/>
+                <text x="30" y="38" fill="#8b949e" font-size="13" font-family="sans-serif">API keys</text>
+                <rect x="30" y="52" width="480" height="44" rx="8" fill="#0d1117" stroke="#30363d"/>
+                <text x="48" y="80" fill="#38bdf8" font-size="13" font-family="monospace" text-decoration="underline">AIzaSyB●●●●●●●●</text>
+                <rect x="430" y="62" width="28" height="24" rx="4" fill="#1e3a5f" stroke="#3b82f6"/>
+                <text x="437" y="80" fill="#60a5fa" font-size="13" font-family="sans-serif">📋</text>
+                <line x1="130" y1="96" x2="130" y2="118" stroke="#f97316" stroke-width="2" marker-end="url(#arrKM1)"/>
+                <rect x="20" y="122" width="250" height="48" rx="8" fill="rgba(249,115,22,0.12)" stroke="#f97316" stroke-dasharray="4"/>
+                <text x="34" y="142" fill="#f97316" font-size="12" font-weight="bold" font-family="sans-serif">方法❶ キー名をクリック</text>
+                <text x="34" y="160" fill="#f97316" font-size="11" font-family="sans-serif">→ 詳細パネルが開き全文が表示される</text>
+                <line x1="444" y1="86" x2="444" y2="118" stroke="#34d399" stroke-width="2" marker-end="url(#arrKM2)"/>
+                <rect x="290" y="122" width="220" height="48" rx="8" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-dasharray="4"/>
+                <text x="304" y="142" fill="#34d399" font-size="12" font-weight="bold" font-family="sans-serif">方法❷ 📋アイコンをクリック</text>
+                <text x="304" y="160" fill="#34d399" font-size="11" font-family="sans-serif">→ 全文が直接コピーされる</text>
+                <rect x="30" y="184" width="480" height="42" rx="8" fill="rgba(249,115,22,0.08)" stroke="#f97316" stroke-dasharray="3"/>
+                <text x="48" y="202" fill="#f97316" font-size="12" font-weight="bold" font-family="sans-serif">⚠️ 一覧ではキーが省略表示されています（途中が●●●で隠れている）</text>
+                <text x="62" y="218" fill="#8b949e" font-size="11" font-family="sans-serif">省略されたまま手動コピーしないよう注意！ 必ず上の❶か❷の方法で取得してください</text>
+                <defs>
+                  <marker id="arrKM1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#f97316"/></marker>
+                  <marker id="arrKM2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#34d399"/></marker>
+                </defs>
+              </svg>
+            </div>
+
+            すでにキーがある場合は上の図の❶または❷で全文を取得します。<br>
+            初めての場合は「APIキーを作成」→「キーを作成」でキーを発行してコピーします。<br><br>
 
             <strong>② スプレッドシートのコピーを作成する</strong><br>
             管理者から元のスプレッドシートを共有してもらい、
@@ -1003,11 +1087,50 @@
             <strong>③ 自分のコピーでスクリプトプロパティを設定する</strong><br>
             コピーしたスプレッドシートで「拡張機能」→「Apps Script」→「プロジェクトの設定（⚙️）」→「スクリプトプロパティ」。<br><br>
 
-            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;">
-              <div style="font-weight:700;color:var(--accent2);margin-bottom:8px;">⚠️ すでにプロパティがある場合</div>
-              <div style="color:var(--text);font-size:14px;line-height:1.7;">
-                値は<strong>●●●で非表示</strong>になっています。<strong>「スクリプトプロパティを編集」</strong>をクリックすると値が表示・編集可能になります。
+            <!-- 図解：初めての場合 -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;">
+              <div style="font-weight:700;color:var(--accent);margin-bottom:12px;">📌 パターンA：プロパティが何もない場合</div>
+              <svg viewBox="0 0 520 120" style="width:100%;max-width:520px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="500" height="100" rx="10" fill="#1c2330" stroke="#30363d"/>
+                <text x="30" y="38" fill="#8b949e" font-size="13" font-family="sans-serif">スクリプトプロパティ</text>
+                <rect x="30" y="55" width="230" height="38" rx="8" fill="#1e40af" stroke="#3b82f6"/>
+                <text x="70" y="80" fill="white" font-size="13" font-weight="bold" font-family="sans-serif">＋ スクリプトプロパティを追加</text>
+                <line x1="280" y1="74" x2="320" y2="74" stroke="#f97316" stroke-width="2" marker-end="url(#arrM1)"/>
+                <text x="330" y="70" fill="#f97316" font-size="12" font-weight="bold" font-family="sans-serif">ここをクリック</text>
+                <text x="330" y="88" fill="#8b949e" font-size="11" font-family="sans-serif">↓ 入力欄が表示されます</text>
+                <defs><marker id="arrM1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#f97316"/></marker></defs>
+              </svg>
+            </div>
+
+            <!-- 図解：すでにキーがある場合 -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;">
+              <div style="font-weight:700;color:var(--accent2);margin-bottom:12px;">📌 パターンB：すでにプロパティがある場合</div>
+              <div style="color:var(--text);font-size:15px;line-height:1.8;margin-bottom:12px;">
+                すでにキーが設定されている場合、値は<strong>非表示（●●●で隠れている）</strong>になっています。<br>
+                <strong>「スクリプトプロパティを編集」</strong>をクリックすると、値が表示・編集可能になります。
               </div>
+              <svg viewBox="0 0 520 180" style="width:100%;max-width:520px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="500" height="160" rx="10" fill="#1c2330" stroke="#30363d"/>
+                <text x="30" y="38" fill="#8b949e" font-size="13" font-family="sans-serif">スクリプトプロパティ</text>
+                <rect x="30" y="50" width="200" height="32" rx="6" fill="#0d1117" stroke="#30363d"/>
+                <text x="42" y="72" fill="#e6edf3" font-size="12" font-family="monospace">GEMINI_API_KEY</text>
+                <rect x="240" y="50" width="200" height="32" rx="6" fill="#0d1117" stroke="#30363d"/>
+                <text x="252" y="72" fill="#8b949e" font-size="12" font-family="monospace">●●●●●●●●●●●●</text>
+                <text x="460" y="72" fill="#f97316" font-size="16" font-family="sans-serif">←</text>
+                <rect x="30" y="100" width="220" height="38" rx="8" fill="#065f46" stroke="#34d399"/>
+                <text x="55" y="125" fill="white" font-size="13" font-weight="bold" font-family="sans-serif">✏️ スクリプトプロパティを編集</text>
+                <line x1="270" y1="119" x2="310" y2="119" stroke="#34d399" stroke-width="2" marker-end="url(#arrM2)"/>
+                <text x="320" y="115" fill="#34d399" font-size="12" font-weight="bold" font-family="sans-serif">ここをクリックすると</text>
+                <text x="320" y="133" fill="#34d399" font-size="12" font-family="sans-serif">値が表示・編集可能に</text>
+                <defs><marker id="arrM2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#34d399"/></marker></defs>
+              </svg>
+              <div class="callout callout-warn" style="margin-top:12px;">
+                <span class="callout-icon">⚠️</span>
+                <span>値は普段●●●で非表示です。「スクリプトプロパティを編集」を押さないと中身が見えません。</span>
+              </div>
+            </div>
+
+            <div style="display:none"><!-- placeholder -->
             </div>
 
             <strong>プロパティがない場合：</strong>「スクリプトプロパティを追加」で新規追加。<br>
@@ -1089,12 +1212,12 @@
         <div class="flow-content">
           <h3>AIとの対話で本当のゴールを見つける</h3>
           <p>
-            AIが「なぜそれをやりたいんですか？」「きっかけは？」と質問してきます。<br>
-            これは表面的なタスクの奥にある<strong>本当の目的</strong>を引き出すため。<br>
-            最大5回の対話で、あなた自身も気づいていなかった本質的なゴールが明確になります。<br>
-            <strong>残り回数が画面に表示される</strong>ので、あとどのくらいかが一目で分かります。
+            AIが選択肢（A/B/C）を提示します。タップするだけでOK。<br>
+            「その他」を選んだときだけ自由記述ができます。<br>
+            最短<strong>3回のやりとり</strong>で、あなた自身も気づいていなかった本質的なゴールが<br>
+            <strong>4つの視点</strong>の選択肢として可視化され、最もしっくりくるものを選べます。
           </p>
-          <span class="tag tag-new">✨ NEW: 残り回数カウンター付き</span>
+          <span class="tag tag-new">✨ NEW: 選択肢タップ方式・最短3回で完了</span>
         </div>
       </div>
 
@@ -1104,10 +1227,12 @@
           <h3>ゴール日を設定し、フェーズを選択</h3>
           <p>
             いつまでに達成したいかを設定。ゴール名の微調整もできます。<br>
+            タスクの規模に応じた<strong>推奨ゴール日</strong>が自動表示され、<br>
+            デフォルト値として設定されます（変更は自由にできます）。<br>
             事業計画系のタスクでは<strong>フェーズ選択パネル</strong>が表示され、<br>
-            必要なフェーズだけをON/OFFで選べます。
+            選択フェーズ数に応じて推奨日が動的に変わります。
           </p>
-          <span class="tag tag-new">✨ NEW: 6フェーズから自由に選択</span>
+          <span class="tag tag-new">✨ NEW: 推奨ゴール日の自動提案 / 6フェーズから自由に選択</span>
         </div>
       </div>
 
@@ -1241,13 +1366,13 @@
       </div>
       <div class="tip-card">
         <span class="tip-emoji">💬</span>
-        <h4>AIの質問には正直に</h4>
-        <p>「なぜ？」に対して本音で答えるほど、精度の高いゴール設定ができます。建前より本音。</p>
+        <h4>選択肢は直感でタップ</h4>
+        <p>A〜Cの選択肢をタップするだけ。ぴったりくるものがなければ「D: その他」で自由記述もできます。直感で選ぶほどゴールが本質に近づきます。</p>
       </div>
       <div class="tip-card">
         <span class="tip-emoji">📅</span>
-        <h4>ゴール日は余裕を持って</h4>
-        <p>AIは営業日ベースで逆算します。タイトすぎるとマイルストーンが詰まりすぎるので、少し余裕を持たせましょう。</p>
+        <h4>推奨ゴール日を参考に</h4>
+        <p>タスクの規模に応じた推奨日が自動表示されます（例：事業計画書は20〜30営業日）。短くしたい場合は自由に変更できますが、警告が表示されます。</p>
       </div>
       <div class="tip-card">
         <span class="tip-emoji">🤖</span>
@@ -1286,7 +1411,16 @@
     </div>
 
     <div class="faq-item" onclick="this.classList.toggle('open')">
-      <div class="faq-q">APIキーのエラーが出ます</div>
+      <div class="faq-item">
+      <div class="faq-q">対話中に画面が止まることはありますか？</div>
+      <div class="faq-a">
+        AIサーバーが混み合っているとき、🤖がコーヒーブレイクするアニメーションが表示されます。
+        プログレスバーのカウントダウンが終わると<strong>自動で再送信</strong>されるので、
+        何もしなくて大丈夫です。エラーメッセージは表示されません。
+        万が一4回リトライしても解消しない場合のみ、スキップボタンが表示されます。
+      </div>
+    </div>
+    <div class="faq-q">APIキーのエラーが出ます</div>
       <div class="faq-a"><p>
         以下の順番で確認してください。<br><br>
         <strong>① スクリプトプロパティの設定を確認</strong><br>

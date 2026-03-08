@@ -17,6 +17,7 @@
     --accent-light: #fef3c7;
     --bg-header: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
     --bg-body: #f0f4f8;
+    --bg-pattern-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cdefs%3E%3Cpattern id='grid' width='80' height='80' patternUnits='userSpaceOnUse'%3E%3Crect width='80' height='80' fill='%23f0f4f8'/%3E%3Cpath d='M0 0h80v80H0z' fill='none' stroke='%23c7d8ef' stroke-width='0.5'/%3E%3Cpath d='M20 0v80M40 0v80M60 0v80M0 20h80M0 40h80M0 60h80' stroke='%23dae5f3' stroke-width='0.3'/%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23a8c0de' opacity='0.7'/%3E%3Ccircle cx='80' cy='0' r='1.5' fill='%23a8c0de' opacity='0.7'/%3E%3Ccircle cx='0' cy='80' r='1.5' fill='%23a8c0de' opacity='0.7'/%3E%3Ccircle cx='80' cy='80' r='1.5' fill='%23a8c0de' opacity='0.7'/%3E%3Ccircle cx='40' cy='40' r='1' fill='%23a8c0de' opacity='0.4'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='80' height='80' fill='url(%23grid)'/%3E%3C/svg%3E");
     --bg-card: #ffffff;
     --bg-input: #f8fafc;
     --text: #1e293b;
@@ -36,7 +37,8 @@
     --accent: #f59e0b;
     --accent-light: #fef3c7;
     --bg-header: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
-    --bg-body: #f0fdf4;
+    --bg-body: #f4fef6;
+    --bg-pattern-img: none;  /* グリッド線なし */
     --bg-card: #ffffff;
     --bg-input: #f0fdf4;
     --text: #1e293b;
@@ -47,12 +49,15 @@
   
   body {
     font-family: 'Noto Sans JP', sans-serif;
-    background: var(--bg-body);
+    background-color: var(--bg-body);
+    background-image: var(--bg-pattern-img, none);
+    background-attachment: fixed;
     color: var(--text);
     font-size: 18px;
     line-height: 1.7;
     transition: background 0.4s ease;
     min-height: 100vh;
+    position: relative;
   }
   
   /* ── Header ── */
@@ -65,6 +70,24 @@
     top: 0;
     z-index: 10;
     transition: background 0.4s ease;
+    overflow: hidden;
+  }
+  /* ビジネス用ヘッダー装飾: 回路基板風ライン */
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cg stroke='rgba(255,255,255,0.07)' stroke-width='1' fill='none'%3E%3Cpath d='M0 30h20M30 30h20M60 30h20M90 30h20M110 30h10'/%3E%3Cpath d='M20 30v-12h10M50 30v12h10M80 30v-8h10M110 30v10'/%3E%3Ccircle cx='20' cy='30' r='2.5' fill='rgba(255,255,255,0.12)' stroke='none'/%3E%3Ccircle cx='50' cy='42' r='2' fill='rgba(255,255,255,0.1)' stroke='none'/%3E%3Ccircle cx='80' cy='22' r='2' fill='rgba(255,255,255,0.1)' stroke='none'/%3E%3Ccircle cx='110' cy='40' r='1.5' fill='rgba(255,255,255,0.08)' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 120px 60px;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+  }
+  /* プライベート用ヘッダー装飾: 葉のシルエット */
+  .theme-private .header::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='80'%3E%3Cg fill='rgba(255,255,255,0.06)'%3E%3Cellipse cx='15' cy='70' rx='6' ry='14' transform='rotate(-30 15 70)'/%3E%3Cellipse cx='15' cy='70' rx='4' ry='10' transform='rotate(-50 15 70)'/%3E%3Cellipse cx='50' cy='20' rx='8' ry='18' transform='rotate(20 50 20)'/%3E%3Cellipse cx='50' cy='20' rx='5' ry='13' transform='rotate(40 50 20)'/%3E%3Cellipse cx='95' cy='65' rx='7' ry='16' transform='rotate(-15 95 65)'/%3E%3Cellipse cx='95' cy='65' rx='4' ry='11' transform='rotate(-35 95 65)'/%3E%3Cellipse cx='140' cy='25' rx='9' ry='20' transform='rotate(25 140 25)'/%3E%3Cellipse cx='140' cy='25' rx='6' ry='14' transform='rotate(45 140 25)'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 160px 80px;
+    opacity: 0.8;
   }
   .header h1 {
     font-size: 24px;
@@ -89,6 +112,8 @@
     background: var(--bg-card);
     border-bottom: 1px solid var(--border);
     transition: all 0.3s;
+    position: relative;
+    z-index: 1;
   }
   .step-item {
     display: flex;
@@ -130,6 +155,8 @@
     padding: 24px 20px;
     max-width: var(--max-width);
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
   }
   
   /* ── Type Toggle ── */
@@ -272,7 +299,7 @@
   .msg.user { justify-content: flex-end; }
   .msg.assistant { justify-content: flex-start; }
   .msg-bubble {
-    max-width: 85%;
+    max-width: 92%;
     padding: 14px 18px;
     border-radius: 16px;
     font-size: 17px;
@@ -338,11 +365,11 @@
 
   .hearing-counter {
     text-align: center;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    padding: 4px 0;
-    letter-spacing: 0.5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    padding: 6px 0 10px;
+    letter-spacing: 0.3px;
   }
   .hearing-counter span { font-weight: 700; color: var(--primary); }
 
@@ -587,6 +614,75 @@
   .phase-name { font-size: 16px; font-weight: 600; color: var(--text); }
   .phase-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
   
+
+  /* ── Nature Animation (Private Mode) ── */
+  .nature-layer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .theme-private .nature-layer { display: block; }
+
+  .leaf, .flower {
+    position: absolute;
+    opacity: 0;
+    transform-origin: bottom center;
+    animation: sway 0s ease-in-out infinite alternate;
+  }
+
+  /* 各要素のアニメーション定義 */
+  @keyframes sway1 {
+    0%   { transform: rotate(-8deg) scale(1);    opacity: 0.22; }
+    100% { transform: rotate(8deg)  scale(1.03); opacity: 0.28; }
+  }
+  @keyframes sway2 {
+    0%   { transform: rotate(6deg)  scale(1.02); opacity: 0.18; }
+    100% { transform: rotate(-6deg) scale(0.98); opacity: 0.25; }
+  }
+  @keyframes sway3 {
+    0%   { transform: rotate(-5deg) scale(0.98); opacity: 0.15; }
+    100% { transform: rotate(7deg)  scale(1.02); opacity: 0.22; }
+  }
+  @keyframes sway4 {
+    0%   { transform: rotate(9deg)  scale(1);    opacity: 0.20; }
+    100% { transform: rotate(-7deg) scale(1.04); opacity: 0.26; }
+  }
+  @keyframes sway5 {
+    0%   { transform: rotate(-6deg) scale(1.01); opacity: 0.16; }
+    100% { transform: rotate(8deg)  scale(0.97); opacity: 0.23; }
+  }
+  @keyframes floatup {
+    0%   { transform: translateY(0px)   rotate(-4deg); opacity: 0.20; }
+    50%  { transform: translateY(-8px)  rotate(4deg);  opacity: 0.28; }
+    100% { transform: translateY(0px)   rotate(-4deg); opacity: 0.20; }
+  }
+
+  /* ── 葉（12枚・全域に散りばめ） ── */
+  .leaf-1  { bottom: 10%; left: 2%;   width: 88px;  animation: sway1 4.2s ease-in-out infinite alternate; }
+  .leaf-2  { bottom: 6%;  right: 2%;  width: 108px; animation: sway2 3.8s ease-in-out infinite alternate; animation-delay: -1.2s; }
+  .leaf-3  { top: 28%;   left: 0%;   width: 68px;  animation: sway3 5.0s ease-in-out infinite alternate; animation-delay: -0.8s; }
+  .leaf-4  { top: 38%;   right: 0%;  width: 78px;  animation: sway4 4.5s ease-in-out infinite alternate; animation-delay: -2.0s; }
+  .leaf-5  { top: 8%;    left: 4%;   width: 58px;  animation: sway5 3.5s ease-in-out infinite alternate; animation-delay: -0.5s; }
+  .leaf-6  { top: 6%;    right: 3%;  width: 72px;  animation: sway1 4.8s ease-in-out infinite alternate; animation-delay: -3.0s; }
+  .leaf-7  { top: 55%;   left: 2%;   width: 62px;  animation: sway2 4.0s ease-in-out infinite alternate; animation-delay: -1.8s; }
+  .leaf-8  { top: 62%;   right: 1%;  width: 80px;  animation: sway3 4.6s ease-in-out infinite alternate; animation-delay: -0.3s; }
+  .leaf-9  { bottom: 28%; left: 1%;  width: 50px;  animation: sway4 3.7s ease-in-out infinite alternate; animation-delay: -2.5s; }
+  .leaf-10 { bottom: 22%; right: 3%; width: 65px;  animation: sway5 5.2s ease-in-out infinite alternate; animation-delay: -1.5s; }
+  .leaf-11 { top: 18%;   left: 1%;   width: 45px;  animation: sway1 3.9s ease-in-out infinite alternate; animation-delay: -4.0s; }
+  .leaf-12 { top: 72%;   right: 2%;  width: 55px;  animation: sway2 4.3s ease-in-out infinite alternate; animation-delay: -0.7s; }
+  /* ── 花（8輪・全域に散りばめ） ── */
+  .flower-1 { bottom: 18%; left: 7%;   width: 50px; animation: floatup 5.5s ease-in-out infinite; }
+  .flower-2 { top: 52%;    right: 5%;  width: 44px; animation: floatup 4.8s ease-in-out infinite; animation-delay: -2.5s; }
+  .flower-3 { top: 16%;    left: 38%;  width: 36px; animation: floatup 6.0s ease-in-out infinite; animation-delay: -1.0s; }
+  .flower-4 { top: 35%;    left: 3%;   width: 42px; animation: floatup 5.2s ease-in-out infinite; animation-delay: -3.2s; }
+  .flower-5 { bottom: 35%; right: 5%;  width: 38px; animation: floatup 4.5s ease-in-out infinite; animation-delay: -1.8s; }
+  .flower-6 { top: 75%;    left: 6%;   width: 32px; animation: floatup 5.8s ease-in-out infinite; animation-delay: -0.5s; }
+  .flower-7 { top: 5%;     right: 12%; width: 40px; animation: floatup 6.5s ease-in-out infinite; animation-delay: -2.0s; }
+  .flower-8 { bottom: 48%; left: 1%;   width: 35px; animation: floatup 4.2s ease-in-out infinite; animation-delay: -3.8s; }
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -637,6 +733,186 @@
     border: 1.5px dashed var(--border);
   }
   .quick-reply-no:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* ── Choice UI ── */
+  .choice-question {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  .choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  .choice-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    transition: all 0.18s;
+    color: var(--text);
+  }
+  .choice-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .choice-btn.selected { border-color: var(--primary); background: var(--primary-soft); font-weight: 600; }
+  .choice-btn.goal-choice { border-color: #a3e635; background: #f7fee7; }
+  .choice-btn.goal-choice:hover { border-color: #65a30d; background: #ecfccb; }
+  .choice-label {
+    display: inline-block;
+    min-width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 6px;
+    background: var(--primary);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .choice-btn.goal-choice .choice-label { background: #65a30d; }
+  .choice-other-input {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+  }
+  .choice-other-input input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--bg-input);
+    color: var(--text);
+  }
+  .choice-other-input input:focus { outline: none; border-color: var(--primary); }
+  .thinking-bubble {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-dim);
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border-radius: 16px 16px 16px 4px;
+    border: 1px solid var(--border);
+    width: fit-content;
+    animation: msgIn 0.3s ease-out;
+  }
+  .thinking-dots span {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: dotBounce 1.2s ease-in-out infinite;
+    margin: 0 1px;
+  }
+  .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotBounce {
+    0%,80%,100% { transform: translateY(0); opacity:0.4; }
+    40% { transform: translateY(-6px); opacity:1; }
+  }
+
+  /* ── Coffee Break UI ── */
+  .coffee-break-wrap {
+    background: linear-gradient(135deg, #fef9f0 0%, #fff8f1 100%);
+    border: 1.5px solid #fed7aa;
+    border-radius: 18px;
+    padding: 16px 18px;
+    max-width: 92%;
+    min-width: 260px;
+    animation: msgIn 0.4s ease-out;
+  }
+  .coffee-break-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .coffee-scene {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 64px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  /* AI キャラ */
+  .ai-char {
+    font-size: 32px;
+    transition: transform 0.5s ease;
+    position: relative;
+  }
+  .ai-char.sitting { animation: sitSway 2s ease-in-out infinite; }
+  .ai-char.drinking { animation: drinkTilt 1s ease-in-out infinite alternate; }
+  .ai-char.walking { animation: walkBounce 0.5s ease-in-out infinite alternate; }
+  .ai-char.working { animation: workNod 1.5s ease-in-out infinite; }
+  @keyframes sitSway {
+    0%,100% { transform: rotate(-3deg); }
+    50%      { transform: rotate(3deg); }
+  }
+  @keyframes drinkTilt {
+    0%   { transform: rotate(0deg) translateY(0); }
+    100% { transform: rotate(-15deg) translateY(-4px); }
+  }
+  @keyframes walkBounce {
+    0%   { transform: translateY(0) scaleX(1); }
+    100% { transform: translateY(-5px) scaleX(1); }
+  }
+  @keyframes workNod {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
+  }
+  .coffee-cup { font-size: 22px; animation: steamRise 1.5s ease-in-out infinite; }
+  @keyframes steamRise {
+    0%,100% { transform: translateY(0) rotate(-5deg); }
+    50%      { transform: translateY(-3px) rotate(5deg); }
+  }
+  .desk-icon { font-size: 20px; }
+  .scene-label {
+    position: absolute;
+    bottom: -18px;
+    left: 0; right: 0;
+    font-size: 11px;
+    color: #a16207;
+    text-align: center;
+    font-weight: 600;
+  }
+  /* プログレスバー */
+  .coffee-progress-track {
+    height: 6px;
+    background: #fed7aa;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .coffee-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f97316, #fb923c);
+    border-radius: 99px;
+    transition: width 1s linear;
+  }
+  .coffee-progress-label {
+    font-size: 11px;
+    color: #92400e;
+    margin-top: 5px;
+    text-align: right;
+  }
 
   /* ── Preview Cards ── */
   .preview-item {
@@ -766,6 +1042,195 @@
 </head>
 <body>
 
+<!-- Nature Layer (Private Mode) -->
+<div class="nature-layer" id="natureLayer">
+
+  <!-- ═══ 葉 12枚: 画面全域に散りばめ ═══ -->
+
+  <!-- 葉1: 左下・大 -->
+  <svg class="leaf leaf-1" viewBox="0 0 90 110" xmlns="http://www.w3.org/2000/svg">
+    <path d="M45 105 Q8 70 15 25 Q35 0 55 18 Q78 45 58 80 Q52 95 45 105z" fill="#22c55e" opacity="0.48"/>
+    <line x1="45" y1="105" x2="38" y2="18" stroke="#15803d" stroke-width="1" opacity="0.3"/>
+    <path d="M42 82 Q22 64 16 44" stroke="#15803d" stroke-width="0.7" fill="none" opacity="0.2"/>
+    <path d="M46 82 Q62 66 68 48" stroke="#15803d" stroke-width="0.7" fill="none" opacity="0.2"/>
+  </svg>
+
+  <!-- 葉2: 右下・横長 -->
+  <svg class="leaf leaf-2" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 65 Q0 35 30 12 Q70 -5 105 20 Q122 50 85 68 Q52 82 10 65z" fill="#86efac" opacity="0.42"/>
+    <line x1="10" y1="65" x2="100" y2="18" stroke="#16a34a" stroke-width="0.9" opacity="0.26"/>
+    <path d="M40 68 Q28 52 22 36" stroke="#16a34a" stroke-width="0.6" fill="none" opacity="0.18"/>
+    <path d="M72 62 Q80 44 88 30" stroke="#16a34a" stroke-width="0.6" fill="none" opacity="0.18"/>
+  </svg>
+
+  <!-- 葉3: 左中・細長 -->
+  <svg class="leaf leaf-3" viewBox="0 0 50 90" xmlns="http://www.w3.org/2000/svg">
+    <path d="M25 86 Q5 58 10 20 Q25 2 40 20 Q45 58 25 86z" fill="#4ade80" opacity="0.46"/>
+    <line x1="25" y1="86" x2="25" y2="18" stroke="#166534" stroke-width="0.8" opacity="0.28"/>
+  </svg>
+
+  <!-- 葉4: 右中・大丸 -->
+  <svg class="leaf leaf-4" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 86 Q8 58 12 22 Q30 0 50 8 Q72 22 70 55 Q60 80 40 86z" fill="#6ee7b7" opacity="0.44"/>
+    <line x1="40" y1="86" x2="44" y2="8" stroke="#059669" stroke-width="1" opacity="0.28"/>
+    <path d="M40 66 Q22 52 15 36" stroke="#059669" stroke-width="0.7" fill="none" opacity="0.2"/>
+    <path d="M40 66 Q58 54 66 40" stroke="#059669" stroke-width="0.7" fill="none" opacity="0.2"/>
+  </svg>
+
+  <!-- 葉5: 左上・小 -->
+  <svg class="leaf leaf-5" viewBox="0 0 55 70" xmlns="http://www.w3.org/2000/svg">
+    <path d="M27 66 Q6 44 10 16 Q27 0 44 16 Q48 44 27 66z" fill="#34d399" opacity="0.5"/>
+    <line x1="27" y1="66" x2="27" y2="14" stroke="#047857" stroke-width="0.7" opacity="0.28"/>
+  </svg>
+
+  <!-- 葉6: 右上・非対称 -->
+  <svg class="leaf leaf-6" viewBox="0 0 75 90" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 84 Q0 52 14 18 Q36 0 58 14 Q76 38 56 68 Q40 86 16 84z" fill="#a7f3d0" opacity="0.4"/>
+    <line x1="16" y1="84" x2="48" y2="12" stroke="#059669" stroke-width="0.9" opacity="0.25"/>
+  </svg>
+
+  <!-- 葉7: 左中下 -->
+  <svg class="leaf leaf-7" viewBox="0 0 55 90" xmlns="http://www.w3.org/2000/svg">
+    <path d="M27 85 Q5 55 12 18 Q27 0 42 18 Q50 55 27 85z" fill="#34d399" opacity="0.48"/>
+    <line x1="27" y1="85" x2="27" y2="16" stroke="#059669" stroke-width="0.8" opacity="0.28"/>
+    <path d="M27 65 Q16 52 12 38" stroke="#059669" stroke-width="0.6" fill="none" opacity="0.2"/>
+    <path d="M27 65 Q38 52 42 38" stroke="#059669" stroke-width="0.6" fill="none" opacity="0.2"/>
+  </svg>
+
+  <!-- 葉8: 右中下・大 -->
+  <svg class="leaf leaf-8" viewBox="0 0 85 95" xmlns="http://www.w3.org/2000/svg">
+    <path d="M42 90 Q8 58 12 22 Q28 0 42 4 Q58 0 72 22 Q76 58 42 90z" fill="#6ee7b7" opacity="0.42"/>
+    <line x1="42" y1="90" x2="42" y2="6" stroke="#10b981" stroke-width="1" opacity="0.26"/>
+  </svg>
+
+  <!-- 葉9: 左下小 -->
+  <svg class="leaf leaf-9" viewBox="0 0 45 75" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22 70 Q4 45 10 14 Q22 0 34 14 Q40 45 22 70z" fill="#4ade80" opacity="0.5"/>
+    <line x1="22" y1="70" x2="22" y2="12" stroke="#16a34a" stroke-width="0.7" opacity="0.28"/>
+  </svg>
+
+  <!-- 葉10: 右下横楕円 -->
+  <svg class="leaf leaf-10" viewBox="0 0 100 65" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 55 Q0 30 25 8 Q60 -4 92 16 Q105 42 68 58 Q40 70 8 55z" fill="#86efac" opacity="0.44"/>
+    <line x1="8" y1="55" x2="88" y2="14" stroke="#22c55e" stroke-width="0.9" opacity="0.26"/>
+  </svg>
+
+  <!-- 葉11: 左上極小 -->
+  <svg class="leaf leaf-11" viewBox="0 0 38 60" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19 56 Q4 36 9 10 Q19 0 29 10 Q34 36 19 56z" fill="#22c55e" opacity="0.5"/>
+    <line x1="19" y1="56" x2="19" y2="8" stroke="#15803d" stroke-width="0.7" opacity="0.28"/>
+  </svg>
+
+  <!-- 葉12: 右下大 -->
+  <svg class="leaf leaf-12" viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 92 Q0 56 14 20 Q32 0 56 12 Q78 38 58 72 Q42 90 18 92z" fill="#34d399" opacity="0.4"/>
+    <line x1="18" y1="92" x2="50" y2="10" stroke="#059669" stroke-width="0.9" opacity="0.25"/>
+  </svg>
+
+  <!-- ═══ 花 8輪: 全域に散りばめ ═══ -->
+
+  <!-- 花1: ピンク・左下 -->
+  <svg class="flower flower-1" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(30,30)">
+      <ellipse cx="0" cy="-13" rx="7" ry="11" fill="#f9a8d4" opacity="0.72" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-13" rx="7" ry="11" fill="#f472b6" opacity="0.65" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-13" rx="7" ry="11" fill="#f9a8d4" opacity="0.72" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-13" rx="7" ry="11" fill="#f472b6" opacity="0.65" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-13" rx="7" ry="11" fill="#f9a8d4" opacity="0.72" transform="rotate(288)"/>
+      <circle cx="0" cy="0" r="7" fill="#fef9c3" opacity="0.92"/>
+    </g>
+  </svg>
+
+  <!-- 花2: 紫・右中 -->
+  <svg class="flower flower-2" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(25,25)">
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#c4b5fd" opacity="0.72" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#a78bfa" opacity="0.65" transform="rotate(60)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#c4b5fd" opacity="0.72" transform="rotate(120)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#a78bfa" opacity="0.65" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#c4b5fd" opacity="0.72" transform="rotate(240)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#a78bfa" opacity="0.65" transform="rotate(300)"/>
+      <circle cx="0" cy="0" r="6" fill="#fef08a" opacity="0.92"/>
+    </g>
+  </svg>
+
+  <!-- 花3: オレンジ・中央上 -->
+  <svg class="flower flower-3" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(22,22)">
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fed7aa" opacity="0.72" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fb923c" opacity="0.65" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fed7aa" opacity="0.72" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fb923c" opacity="0.65" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fed7aa" opacity="0.72" transform="rotate(288)"/>
+      <circle cx="0" cy="0" r="5" fill="#fef08a" opacity="0.92"/>
+    </g>
+  </svg>
+
+  <!-- 花4: 赤紫・左中 -->
+  <svg class="flower flower-4" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(26,26)">
+      <ellipse cx="0" cy="-12" rx="6" ry="10" fill="#f0abfc" opacity="0.72" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-12" rx="6" ry="10" fill="#e879f9" opacity="0.65" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-12" rx="6" ry="10" fill="#f0abfc" opacity="0.72" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-12" rx="6" ry="10" fill="#e879f9" opacity="0.65" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-12" rx="6" ry="10" fill="#f0abfc" opacity="0.72" transform="rotate(288)"/>
+      <circle cx="0" cy="0" r="6" fill="#fef9c3" opacity="0.92"/>
+    </g>
+  </svg>
+
+  <!-- 花5: 白ピンク・右下 -->
+  <svg class="flower flower-5" viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(23,23)">
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fce7f3" opacity="0.8" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fbcfe8" opacity="0.75" transform="rotate(60)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fce7f3" opacity="0.8" transform="rotate(120)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fbcfe8" opacity="0.75" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fce7f3" opacity="0.8" transform="rotate(240)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#fbcfe8" opacity="0.75" transform="rotate(300)"/>
+      <circle cx="0" cy="0" r="5" fill="#fef08a" opacity="0.92"/>
+    </g>
+  </svg>
+
+  <!-- 花6: 青・左下 -->
+  <svg class="flower flower-6" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(21,21)">
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#bfdbfe" opacity="0.78" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#93c5fd" opacity="0.72" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#bfdbfe" opacity="0.78" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#93c5fd" opacity="0.72" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-10" rx="5" ry="8" fill="#bfdbfe" opacity="0.78" transform="rotate(288)"/>
+      <circle cx="0" cy="0" r="5" fill="#fef9c3" opacity="0.92"/>
+    </g>
+  </svg>
+
+  <!-- 花7: サーモン・右上 -->
+  <svg class="flower flower-7" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(24,24)">
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#fca5a5" opacity="0.72" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#fb7185" opacity="0.65" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#fca5a5" opacity="0.72" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#fb7185" opacity="0.65" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#fca5a5" opacity="0.72" transform="rotate(288)"/>
+      <circle cx="0" cy="0" r="6" fill="#fef08a" opacity="0.92"/>
+    </g>
+  </svg>
+
+  <!-- 花8: 黄緑・左中上 -->
+  <svg class="flower flower-8" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(19,19)">
+      <ellipse cx="0" cy="-9" rx="4" ry="7" fill="#d9f99d" opacity="0.8" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-9" rx="4" ry="7" fill="#bef264" opacity="0.74" transform="rotate(60)"/>
+      <ellipse cx="0" cy="-9" rx="4" ry="7" fill="#d9f99d" opacity="0.8" transform="rotate(120)"/>
+      <ellipse cx="0" cy="-9" rx="4" ry="7" fill="#bef264" opacity="0.74" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-9" rx="4" ry="7" fill="#d9f99d" opacity="0.8" transform="rotate(240)"/>
+      <ellipse cx="0" cy="-9" rx="4" ry="7" fill="#bef264" opacity="0.74" transform="rotate(300)"/>
+      <circle cx="0" cy="0" r="4" fill="#fef9c3" opacity="0.92"/>
+    </g>
+  </svg>
+
+</div>
+
+
 <!-- Setup Screen (shown if no API key) -->
 <!-- API Error Banner -->
 <div class="api-error-banner" id="apiErrorBanner">
@@ -823,7 +1288,7 @@
     
     <div class="feature-hint">
       <span class="hint-icon">✨</span>
-      <span id="hintText">AIが「その仕事、本当のゴールは何ですか？」を引き出します。抽象度を4段階で可視化し、今回のゴールレベルを選べます。</span>
+      <span id="hintText">AIが「その仕事、本当のゴールは何ですか？」を引き出します。4つの視点でゴール候補を提示し、今回の視点を一緒に選びます。</span>
     </div>
   </div>
 </div>
@@ -832,13 +1297,15 @@
 <div class="content hidden" id="step1">
   <div class="chat-container">
     <div class="chat-messages" id="chatMessages"></div>
+    <div id="hearingCounter" class="hearing-counter">あと <span id="hearingRemain">5</span> 問で完了</div>
     <div class="chat-input-area hidden" id="chatInputArea">
-      <div id="hearingCounter" class="hearing-counter">残り <span id="hearingRemain">5</span> / 5 回</div>
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chatInput" placeholder="回答を入力..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="send-btn" onclick="sendMessage()" id="sendBtn">送信</button>
       </div>
-      <button class="skip-btn" onclick="skipToDate()" style="margin-top:6px;">スキップしてスケジュール作成へ →</button>
+    </div>
+    <div style="text-align:center; padding: 8px 0 4px;">
+      <button class="skip-btn" id="skipBtn" onclick="skipToDate()">スキップしてスケジュール作成へ →</button>
     </div>
   </div>
 </div>
@@ -913,7 +1380,8 @@
   <div class="form-row">
     <div class="form-group">
       <label class="form-label">📅 ゴール日</label>
-      <input type="date" class="form-input" id="goalDate">
+      <input type="date" class="form-input" id="goalDate" onchange="onGoalDateChange()">
+      <div id="dateRecommend" style="display:none; margin-top:6px; padding:8px 12px; border-radius:10px; font-size:13px; line-height:1.6;"></div>
     </div>
     <div class="form-group">
       <label class="form-label">🕐 時間</label>
@@ -969,6 +1437,9 @@ var differAxis = '';
 var isLoading = false;
 var schedulePreviewData = [];
 var hearingCount = 0;
+var _prefetchCache = null;   // 先読みキャッシュ
+var _prefetchTimer = null;   // 先読みタイマー
+var _choiceSelected = false; // 連打防止
 var maxHearingQuestions = 5;
 
 // ── Sample Data ──
@@ -1041,7 +1512,7 @@ function setType(priv) {
     : 'あなた専属のAI参謀';
   document.getElementById('hintText').textContent = priv
     ? 'プライベートの予定も、AIが「本当に大切にしたいこと」を引き出してスケジュールを逆算します。旅行、記念日、大掃除、何でもOK！'
-    : 'AIが「その仕事、本当のゴールは何ですか？」を引き出します。抽象度を4段階で可視化し、今回のゴールレベルを選べます。';
+    : 'AIが「その仕事、本当のゴールは何ですか？」を引き出します。4つの視点でゴール候補を提示し、今回の視点を一緒に選びます。';
   
   renderSamples();
 }
@@ -1077,41 +1548,345 @@ var _lastUserText = '';
 function sendMessage() {
   var input = document.getElementById('chatInput');
   var text = input.value.trim();
-  if (!text || isLoading) return;
-
-  _lastUserText = text;
+  if (!text) return;
   input.value = '';
-  addChatMessage('user', text);
-  chatHistory.push({ role: 'user', content: text });
-  setLoading(true);
+  _submitChoice(text);
+}
 
+// ── 選択肢方式ヒアリング ──
+
+function _showThinking() {
+  _removeThinking();
+  var container = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.id = 'thinkingBubble';
+  div.innerHTML = '<div class="thinking-bubble">少し考え中&nbsp;<div class="thinking-dots"><span></span><span></span><span></span></div>&nbsp;🤔</div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function _removeThinking() {
+  var el = document.getElementById('thinkingBubble');
+  if (el) el.remove();
+}
+
+function _callHearing(retryCount) {
+  retryCount = retryCount || 0;
+
+  // キャッシュがあれば即表示
+  if (_prefetchCache) {
+    var cached = _prefetchCache;
+    _prefetchCache = null;
+    _removeThinking();
+    _handleHearingResponse(cached);
+    return;
+  }
+
+  // キャッシュなし → API呼び出し
+  google.script.run
+    .withSuccessHandler(function(raw) {
+      if (raw.indexOf('⚠️') === 0) {
+        if (retryCount < 4) {
+          var waitSec = [12, 25, 40, 60][retryCount];
+          _removeThinking();
+          _showCoffeeBreak(waitSec, retryCount, function() {
+            _callHearing(retryCount + 1);
+          });
+        } else {
+          _removeThinking();
+          _showChoiceError();
+        }
+        return;
+      }
+      _removeThinking();
+      _handleHearingResponse(raw);
+    })
+    .withFailureHandler(function(err) {
+      if (retryCount < 2) {
+        setTimeout(function() { _callHearing(retryCount + 1); }, 8000);
+      } else {
+        _removeThinking();
+        _showChoiceError();
+      }
+    })
+    .continueHearing(chatHistory, taskInput);
+}
+
+function _handleHearingResponse(raw) {
+  try {
+    var data = JSON.parse(raw);
+    if (!data.isGoalSelect && !data.isDone) {
+      hearingCount++;
+      updateHearingCounter();
+    }
+
+    var assistantMsg = data.question;
+    if (data.isGoalSelect) {
+      assistantMsg += '\n' + data.choices.map(function(c){ return c.label + ': ' + c.text; }).join('\n');
+    }
+    chatHistory.push({ role: 'assistant', content: assistantMsg });
+
+    if (data.isDone) {
+      // ゴール確定
+      trueGoal = data.goalText || taskInput;
+      goalLevel = data.goalLevel || '1';
+      bizType = data.bizType || '';
+      dominateAxis = data.dominateAxis || '';
+      differAxis = data.differAxis || '';
+      addChatMessage('assistant', data.question);
+      setTimeout(function() { goToDateStep(); }, 1200);
+      return;
+    }
+
+    _renderChoices(data);
+
+    // 先読み: isGoalSelect でない かつ 残り回数がある場合のみ
+    var remain = maxHearingQuestions - hearingCount;
+    if (!data.isGoalSelect && remain > 0) {
+      _prefetchCache = null;
+      if (_prefetchTimer) clearTimeout(_prefetchTimer);
+      _prefetchTimer = setTimeout(function() {
+        _prefetchNext();
+      }, 1200);
+    }
+
+  } catch(e) {
+    // JSONパース失敗 → テキストとしてフォールバック表示
+    addChatMessage('assistant', raw);
+    checkGoalConfirmed(raw);
+  }
+}
+
+function _prefetchNext() {
+  // 仮の「続けます」メッセージで先読み（実際の選択内容は後でchatHistoryに追加）
+  var tempHistory = chatHistory.concat([{ role: 'user', content: '（次の質問を準備中）' }]);
+  google.script.run
+    .withSuccessHandler(function(raw) {
+      if (raw.indexOf('⚠️') !== 0) {
+        _prefetchCache = raw;
+      }
+    })
+    .withFailureHandler(function(){})
+    .continueHearing(tempHistory, taskInput);
+}
+
+function _renderChoices(data) {
+  _currentChoicesData = data.choices;
+  var container = document.getElementById('chatMessages');
+  var wrap = document.createElement('div');
+  wrap.className = 'msg assistant';
+  wrap.id = 'currentChoices';
+
+  var html = '<div style="max-width:100%;">';
+  html += '<div class="choice-question">' + data.question + '</div>';
+  html += '<div class="choice-list">';
+
+  data.choices.forEach(function(c) {
+    var isOther = c.label === 'D' && !data.isGoalSelect;
+    var goalClass = data.isGoalSelect ? ' goal-choice' : '';
+    // ラベルとテキストをdata属性に直接埋め込む（グローバル変数に依存しない）
+    var safeLabel = c.label.replace(/"/g, '&quot;');
+    var safeText  = c.text.replace(/"/g, '&quot;');
+    html += '<button class="choice-btn' + goalClass + '" ' +
+      'data-label="' + safeLabel + '" ' +
+      'data-text="'  + safeText  + '" ' +
+      'data-goal="'  + (data.isGoalSelect?1:0) + '" ' +
+      'data-other="' + (isOther?1:0) + '" ' +
+      'onclick="_onChoiceClick(this)">' +
+      '<span class="choice-label">' + c.label + '</span>' +
+      '<span>' + c.text + '</span>' +
+      '</button>';
+  });
+
+  html += '</div>';
+  // D選択時の自由記述エリア（初期非表示）
+  html += '<div class="choice-other-input hidden other-input-area">' +
+    '<input type="text" class="other-input-field" placeholder="自由に記述..." onkeydown="_otherInputKey(event,this)">' +
+    '<button class="quick-reply-btn quick-reply-yes" style="padding:10px 16px;font-size:13px;" onclick="_submitOtherField(this)">送信</button>' +
+    '</div>';
+  html += '</div>';
+
+  wrap.innerHTML = html;
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+}
+
+// 現在の選択肢データを保持
+var _currentChoicesData = null;
+
+function _onChoiceClick(btn) {
+  if (_choiceSelected) return;
+  var label     = btn.getAttribute('data-label') || '';
+  var text      = btn.getAttribute('data-text')  || '';
+  var isGoalSel = btn.getAttribute('data-goal')  === '1';
+  var isOther   = btn.getAttribute('data-other') === '1';
+
+  // 「その他」→ テキスト入力を表示（ボタンの親コンテナ内から探す）
+  if (isOther) {
+    var wrap = btn.closest('.msg.assistant');
+    var area = wrap ? wrap.querySelector('.other-input-area') : null;
+    if (area) {
+      area.classList.remove('hidden');
+      var field = area.querySelector('.other-input-field');
+      if (field) field.focus();
+    }
+    return;
+  }
+
+  _choiceSelected = true;
+
+  // ボタンを選択状態に & 無効化
+  var choices = document.getElementById('currentChoices');
+  if (choices) {
+    choices.querySelectorAll('.choice-btn').forEach(function(b){ b.disabled = true; });
+    btn.classList.add('selected');
+  }
+
+  var userText = isGoalSel ? label + ': ' + text : text;
+  _submitChoice(userText, isGoalSel);
+}
+
+function _otherInputKey(e, el) { if (e.key === 'Enter') _submitOtherField(el); }
+
+function _submitOtherField(el) {
+  if (_choiceSelected) return;
+  // el は input か button のどちらか。親の .other-input-area から input を探す
+  var area  = el.closest ? el.closest('.other-input-area') : null;
+  var input = area ? area.querySelector('.other-input-field') : null;
+  if (!input || !input.value.trim()) return;
+  _choiceSelected = true;
+  _submitChoice(input.value.trim());
+}
+
+function _submitChoice(text, isGoalSelect) {
+  _choiceSelected = false;
+  _lastUserText = text;
+  addChatMessage('user', text);
+
+  // ゴール選択のときは GOAL_SELECTED: プレフィックスをつけてCode.gs側でルーティング
+  var historyText = isGoalSelect ? 'GOAL_SELECTED:' + text : text;
+  chatHistory.push({ role: 'user', content: historyText });
+  _showThinking();
   _callHearing();
 }
 
-function _callHearing() {
-  google.script.run
-    .withSuccessHandler(function(reply) {
-      if (reply.indexOf('⚠️') !== 0) {
-        hearingCount++;
-        updateHearingCounter();
-        chatHistory.push({ role: 'assistant', content: reply });
-        addChatMessage('assistant', reply);
-        setLoading(false);
-        checkGoalConfirmed(reply);
-      } else {
-        chatHistory.pop();
-        addChatMessage('assistant', reply);
-        _showRetryButton();
-        setLoading(false);
-      }
-    })
-    .withFailureHandler(function(err) {
-      chatHistory.pop();
-      addChatMessage('assistant', '⚠️ エラー: ' + err.message);
-      _showRetryButton();
-      setLoading(false);
-    })
-    .continueHearing(chatHistory, taskInput);
+// コーヒーブレイク UI（APIビジー時）
+var _coffeeBreakTimer = null;
+var _coffeeIntervalTimer = null;
+
+function _showCoffeeBreak(waitSec, retryIndex, onDone) {
+  // 前のコーヒーブレイクがあれば除去
+  var old = document.getElementById('coffeeBreakMsg');
+  if (old) old.remove();
+
+  var scenes = [
+    { char: '🤖', anim: 'sitting',  cup: '☕', label: 'AIがコーヒーブレイク中...', desk: '' },
+    { char: '🤖', anim: 'drinking', cup: '☕', label: 'ゆっくり一息ついています...', desk: '' },
+    { char: '🤖', anim: 'sitting',  cup: '🍵', label: 'もう少しでデスクに戻ります!', desk: '' },
+    { char: '🤖', anim: 'walking',  cup: '',   label: 'デスクに戻る途中です！', desk: '💼' },
+  ];
+  // retryIndex に応じてシーン変える
+  var sceneIdx = Math.min(retryIndex, scenes.length - 1);
+  var scene = scenes[sceneIdx];
+
+  var titles = [
+    '🤖 AIが少し忙しくなり過ぎています',
+    '😅 まだ少し混んでいます...',
+    '🔄 もう一息です！',
+    '⚡ ラストリトライ！',
+  ];
+  var title = titles[Math.min(retryIndex, titles.length - 1)];
+
+  var container = document.getElementById('chatMessages');
+  var wrap = document.createElement('div');
+  wrap.className = 'msg assistant';
+  wrap.id = 'coffeeBreakMsg';
+
+  wrap.innerHTML =
+    '<div class="coffee-break-wrap">' +
+      '<div class="coffee-break-title">' + title + '</div>' +
+      '<div class="coffee-scene">' +
+        '<span class="ai-char ' + scene.anim + '" id="coffeeChar">' + scene.char + '</span>' +
+        (scene.cup ? '<span class="coffee-cup">' + scene.cup + '</span>' : '') +
+        (scene.desk ? '<span class="desk-icon">' + scene.desk + '</span>' : '') +
+        '<span class="scene-label" id="coffeeLabel">' + scene.label + '</span>' +
+      '</div>' +
+      '<div class="coffee-progress-track">' +
+        '<div class="coffee-progress-fill" id="coffeeBar" style="width:0%"></div>' +
+      '</div>' +
+      '<div class="coffee-progress-label"><span id="coffeeCountdown">' + waitSec + '</span>秒後に自動再送信</div>' +
+    '</div>';
+
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+
+  // プログレスバー & カウントダウン
+  var elapsed = 0;
+  var barEl = document.getElementById('coffeeBar');
+  var countEl = document.getElementById('coffeeCountdown');
+  var labelEl = document.getElementById('coffeeLabel');
+  var charEl  = document.getElementById('coffeeChar');
+
+  // シーン途中で演技を変える
+  var midScene = [
+    { char: '🤖', anim: 'drinking', label: 'おいしい☕ もう少しだけ...' },
+    { char: '🤖', anim: 'sitting',  label: 'リフレッシュ完了！準備中...' },
+    { char: '🤖', anim: 'walking',  label: 'デスクに戻ります！' },
+    { char: '🤖', anim: 'working',  label: '作業再開！あと少し⚡' },
+  ];
+
+  if (_coffeeIntervalTimer) clearInterval(_coffeeIntervalTimer);
+  _coffeeIntervalTimer = setInterval(function() {
+    elapsed++;
+    var pct = Math.min(100, Math.round(elapsed / waitSec * 100));
+    if (barEl) barEl.style.width = pct + '%';
+    if (countEl) countEl.textContent = Math.max(0, waitSec - elapsed);
+
+    // 中盤でシーン変化
+    if (elapsed === Math.floor(waitSec * 0.4) && labelEl && charEl) {
+      var mid = midScene[Math.min(retryIndex, midScene.length - 1)];
+      charEl.className = 'ai-char ' + mid.anim;
+      labelEl.textContent = mid.label;
+    }
+    if (elapsed === Math.floor(waitSec * 0.75) && labelEl && charEl) {
+      charEl.className = 'ai-char walking';
+      labelEl.textContent = 'もうすぐデスクに戻ります 🏃';
+    }
+
+    if (elapsed >= waitSec) {
+      clearInterval(_coffeeIntervalTimer);
+      // コーヒーブレイクUI除去してthinking表示
+      var el = document.getElementById('coffeeBreakMsg');
+      if (el) el.remove();
+      _showThinking();
+      onDone();
+    }
+  }, 1000);
+}
+
+function _showChoiceError() {
+  var container = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.id = 'choiceErrorMsg';
+  div.innerHTML =
+    '<div class="msg-bubble">' +
+      '<div style="margin-bottom:10px;">少し時間をおいてから、もう一度お試しください🙏</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' +
+        '<button class="quick-reply-btn quick-reply-yes" style="font-size:13px;padding:10px 16px;" onclick="_retryAfterError()">🔄 もう一度試す</button>' +
+        '<button class="quick-reply-btn quick-reply-no" style="font-size:13px;" onclick="skipToDate()">このままスケジュール作成へ →</button>' +
+      '</div>' +
+    '</div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function _retryAfterError() {
+  var el = document.getElementById('choiceErrorMsg');
+  if (el) el.remove();
+  _showThinking();
+  _callHearing();
 }
 
 function _showRetryButton() {
@@ -1139,7 +1914,15 @@ function updateHearingCounter() {
   var el = document.getElementById('hearingRemain');
   if (el) el.textContent = remain;
   var counter = document.getElementById('hearingCounter');
-  if (counter) counter.style.color = remain <= 1 ? '#EF4444' : '';
+  if (!counter) return;
+  if (remain <= 0) {
+    counter.textContent = 'ゴールを選択してください';
+    counter.style.color = 'var(--primary)';
+    counter.style.fontWeight = '700';
+  } else {
+    counter.style.color = remain <= 1 ? '#EF4444' : 'var(--text-dim)';
+    counter.style.fontWeight = '600';
+  }
 }
 
 function checkGoalConfirmed(reply) {
@@ -1184,15 +1967,13 @@ function showQuickReply() {
 }
 
 function quickReplyYes() {
-  if (isLoading) return; // 連打防止
+  if (isLoading) return;
   var qr = document.getElementById('quickReply');
   if (qr) qr.remove();
-  document.getElementById('chatInputArea').classList.remove('hidden');
-  document.getElementById('chatInput').focus();
   _lastUserText = 'はい、お願いします';
   addChatMessage('user', _lastUserText);
   chatHistory.push({ role: 'user', content: _lastUserText });
-  setLoading(true);
+  _showThinking();
   _callHearing();
 }
 
@@ -1200,15 +1981,142 @@ function quickReplyNo() {
   skipToDate();
 }
 
+// 日本の祝日（2025-2027）※Code.gsと同期
+var JS_HOLIDAYS = [
+  "2025-01-01","2025-01-13","2025-02-11","2025-02-23","2025-02-24",
+  "2025-03-20","2025-04-29","2025-05-03","2025-05-04","2025-05-05",
+  "2025-05-06","2025-07-21","2025-08-11","2025-09-15","2025-09-23",
+  "2025-10-13","2025-11-03","2025-11-23","2025-11-24",
+  "2026-01-01","2026-01-12","2026-02-11","2026-02-23","2026-03-20",
+  "2026-04-29","2026-05-03","2026-05-04","2026-05-05","2026-05-06",
+  "2026-07-20","2026-08-11","2026-09-21","2026-09-22","2026-09-23",
+  "2026-10-12","2026-11-03","2026-11-23",
+  "2027-01-01","2027-01-11","2027-02-11","2027-02-23","2027-03-21",
+  "2027-03-22","2027-04-29","2027-05-03","2027-05-04","2027-05-05",
+  "2027-07-19","2027-08-11","2027-09-20","2027-09-23","2027-10-11",
+  "2027-11-03","2027-11-23"
+];
+
+function isJsBusinessDay(date) {
+  var d = new Date(date);
+  var dow = d.getDay();
+  if (dow === 0 || dow === 6) return false;
+  var key = d.getFullYear() + '-'
+    + String(d.getMonth()+1).padStart(2,'0') + '-'
+    + String(d.getDate()).padStart(2,'0');
+  return JS_HOLIDAYS.indexOf(key) === -1;
+}
+
+// 今日から n営業日後の日付を返す
+function addBusinessDays(n) {
+  var d = new Date();
+  d.setHours(0,0,0,0);
+  var count = 0;
+  while (count < n) {
+    d.setDate(d.getDate() + 1);
+    if (isJsBusinessDay(d)) count++;
+  }
+  return d;
+}
+
+function toDateInputValue(date) {
+  return date.getFullYear() + '-'
+    + String(date.getMonth()+1).padStart(2,'0') + '-'
+    + String(date.getDate()).padStart(2,'0');
+}
+
 function goToDateStep() {
   goToStep(2);
   document.getElementById('goalDisplay').textContent = trueGoal;
-  document.getElementById('goalLevelDisplay').textContent = '抽象度: Lv' + goalLevel;
+  var _goalLabels = {'1':'📌 今すぐのゴール','2':'🎯 その先のゴール','3':'🌟 大きなゴール','4':'🚀 根本のゴール'};
+  document.getElementById('goalLevelDisplay').textContent = _goalLabels[goalLevel] || ('視点' + goalLevel);
   document.getElementById('goalTitle').value = trueGoal;
-  
+
   // Show phase selection for business plan tasks
   var isBizPlan = !isPrivate && /事業計画|事業計画書|新サービス|起業|新規事業|ローンチ|リリース|立ち上げ|ブランド|PR|マーケ|集客|サービス|収益|売上|ビジネス|法人|開業|創業/.test(taskInput + ' ' + trueGoal);
   document.getElementById('phaseSelection').classList.toggle('hidden', !isBizPlan);
+
+  // 推奨ゴール日を計算してセット
+  setRecommendedDate();
+}
+
+// タスク規模から推奨営業日数を算出
+function calcRecommendedDays() {
+  if (isPrivate) return 3; // プライベートは3日
+
+  // 事業計画系: 選択フェーズ数に応じて加算
+  var isBizPlan = /事業計画|事業計画書|新サービス|起業|新規事業|ローンチ|リリース|立ち上げ|ブランド|PR|マーケ|集客|サービス|収益|売上|ビジネス|法人|開業|創業/.test(taskInput + ' ' + trueGoal);
+  if (isBizPlan) {
+    var checkedCount = 0;
+    ['ph1','ph2','ph3','ph4','ph5','ph6'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && el.checked) checkedCount++;
+    });
+    // フェーズ1つあたり約5営業日、最低20日
+    return Math.max(20, checkedCount * 5);
+  }
+
+  // 通常ビジネス
+  return 10;
+}
+
+function setRecommendedDate() {
+  var days = calcRecommendedDays();
+  var recDate = addBusinessDays(days);
+  var recStr  = toDateInputValue(recDate);
+  var minStr  = toDateInputValue(addBusinessDays(3));
+  var dateEl  = document.getElementById('goalDate');
+
+  // min は常に3営業日後
+  dateEl.min = minStr;
+
+  // 未設定の場合のみ推奨日をデフォルト値にセット
+  if (!dateEl.value) {
+    dateEl.value = recStr;
+  }
+
+  // 推奨メッセージを表示
+  showDateRecommend(days, recStr, dateEl.value);
+}
+
+function showDateRecommend(recDays, recStr, currentVal) {
+  var el = document.getElementById('dateRecommend');
+  if (!el) return;
+
+  var isBizPlan = /事業計画|事業計画書|新サービス|起業|新規事業|ローンチ|リリース|立ち上げ|ブランド|PR|マーケ|集客|サービス|収益|売上|ビジネス|法人|開業|創業/.test(taskInput + ' ' + trueGoal);
+  if (!isBizPlan && !isPrivate) {
+    // 通常ビジネスは簡易メッセージのみ
+    el.style.display = 'block';
+    el.style.background = '#f0f9ff';
+    el.style.border = '1px solid #bae6fd';
+    el.style.color = '#0369a1';
+    el.innerHTML = '💡 推奨: <strong>今日から約' + recDays + '営業日後</strong>（' + recStr.replace(/-/g,'/') + '）以降をおすすめします';
+    return;
+  }
+
+  var isTight = currentVal && currentVal < recStr;
+  if (isTight) {
+    el.style.background = '#fefce8';
+    el.style.border = '1px solid #fde047';
+    el.style.color = '#854d0e';
+    el.innerHTML = '⚠️ このタスク規模には <strong>最低' + recDays + '営業日</strong> が推奨です。<br>'
+      + '推奨日: <strong>' + recStr.replace(/-/g,'/') + '</strong>（現在の設定は少し短めです）<br>'
+      + '<span style="font-size:12px;opacity:0.8;">もちろんこのまま進めることもできます</span>';
+  } else {
+    el.style.background = '#f0fdf4';
+    el.style.border = '1px solid #86efac';
+    el.style.color = '#166534';
+    el.innerHTML = '✅ この規模のタスクには <strong>約' + recDays + '営業日</strong> を推奨しています。<br>'
+      + '推奨日: <strong>' + recStr.replace(/-/g,'/') + '</strong>';
+  }
+  el.style.display = 'block';
+}
+
+function onGoalDateChange() {
+  var days = calcRecommendedDays();
+  var recStr = toDateInputValue(addBusinessDays(days));
+  var currentVal = document.getElementById('goalDate').value;
+  showDateRecommend(days, recStr, currentVal);
 }
 
 // ── Generate Schedule (preview) ──
@@ -1217,6 +2125,12 @@ function generateSchedule() {
   var goalTime = document.getElementById('goalTime').value;
   var goalTitle = document.getElementById('goalTitle').value;
   if (!goalDate) { alert('ゴール日を設定してください'); return; }
+  // 最短3営業日後チェック（それより前は物理的に不可）
+  var hardMin = toDateInputValue(addBusinessDays(3));
+  if (goalDate < hardMin) {
+    alert('ゴール日は今日から3営業日後（' + hardMin + '）以降を指定してください');
+    return;
+  }
   trueGoal = goalTitle || trueGoal;
   document.getElementById('genBtn').disabled = true;
   document.getElementById('genBtn').textContent = '⏳ AIがスケジュールを生成中...';
@@ -1348,6 +2262,8 @@ function resetAll() {
   differAxis = '';
   schedulePreviewData = [];
   hearingCount = 0;
+  _prefetchCache = null;
+  _choiceSelected = false;
   updateHearingCounter();
   document.getElementById('taskInput').value = '';
   document.getElementById('chatMessages').innerHTML = '';
