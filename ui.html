@@ -71,6 +71,17 @@
     z-index: 10;
     transition: background 0.4s ease;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .header-logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    position: relative;
+    z-index: 1;
   }
   /* ビジネス用ヘッダー装飾: 回路基板風ライン */
   .header::before {
@@ -1014,10 +1025,6 @@
 
   /* ── Guide Link ── */
   .guide-link {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
     background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.25);
     border-radius: 8px;
@@ -1032,6 +1039,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    white-space: nowrap;
   }
   .guide-link:hover {
     background: rgba(255,255,255,0.25);
@@ -1238,11 +1246,15 @@
 </div>
 
 <!-- Header -->
-<div class="header" id="mainHeader" style="position:relative;">
-  <h1>🧭 逆算<span class="accent">AI</span></h1>
+<div class="header" id="mainHeader">
+  <div class="header-logo-row">
+    <a class="guide-link hidden" id="topLink" onclick="resetAll()" style="cursor:pointer;">🏠 TOPへ</a>
+    <div>
+      <h1>🧭 逆算<span class="accent">AI</span></h1>
+    </div>
+    <a class="guide-link" href="#" onclick="openManualTab(); return false;">📖 使い方</a>
+  </div>
   <div class="subtitle" id="headerSubtitle">あなた専属のAI参謀</div>
-  <a class="guide-link" href="#" onclick="openManualTab(); return false;">📖 使い方</a>
-  <a class="guide-link hidden" id="topLink" onclick="resetAll()" style="right:auto; left:12px; cursor:pointer;">🏠 TOP</a>
 </div>
 
 <!-- Steps -->
