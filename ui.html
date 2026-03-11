@@ -1682,9 +1682,21 @@ function _handleHearingResponse(raw) {
     }
 
   } catch(e) {
-    // JSONパース失敗 → テキストとしてフォールバック表示
-    addChatMessage('assistant', raw);
-    checkGoalConfirmed(raw);
+    // JSONパース失敗 → フォールバック選択肢を表示（rawをそのまま出さない）
+    var fallbackData = {
+      question: 'もう少し教えてください。今取り組んでいることで、一番大切なことは何ですか？',
+      choices: [
+        {label:'A', text:'成果・目標を達成したい'},
+        {label:'B', text:'課題や問題を解決したい'},
+        {label:'C', text:'周囲や社会に貢献したい'},
+        {label:'D', text:'その他（自由記述）'}
+      ],
+      isGoalSelect: false
+    };
+    hearingCount++;
+    updateHearingCounter();
+    chatHistory.push({ role: 'assistant', content: fallbackData.question });
+    _renderChoices(fallbackData);
   }
 }
 
