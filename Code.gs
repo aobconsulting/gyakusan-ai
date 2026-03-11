@@ -26,6 +26,22 @@ function onOpen() {
     .addToUi();
 }
 
+// ── ログイン中ユーザーのカレンダーを取得 ──
+// プライマリカレンダーID = ログイン中メールアドレス
+// デプロイ設定「ユーザーとして実行」が必要
+function getUserCalendar() {
+  try {
+    var email = Session.getActiveUser().getEmail();
+    if (email) {
+      var cal = CalendarApp.getCalendarById(email);
+      if (cal) return cal;
+    }
+  } catch(e) {}
+  // フォールバック: スクリプトオーナーのデフォルトカレンダー
+  return CalendarApp.getDefaultCalendar();
+}
+
+
 // スプレッドシートを取得（ウェブアプリ対応）
 function getSpreadsheet() {
   // まずアクティブを試す（スプレッドシートから直接実行の場合）
@@ -794,7 +810,7 @@ function exportToCalendar() {
   }
   
   var events = JSON.parse(jsonStr);
-  var calendar = CalendarApp.getDefaultCalendar();
+  var calendar = getUserCalendar();
   var count = 0;
   
   for (var i = 0; i < events.length; i++) {
@@ -1015,7 +1031,7 @@ function saveToSheet(params) {
 
 function saveToCalendar(params) {
   var items = params.items;
-  var calendar = CalendarApp.getDefaultCalendar();
+  var calendar = getUserCalendar();
   var count = 0;
 
   for (var i = 0; i < items.length; i++) {
@@ -1057,7 +1073,8 @@ function saveToBoth(params) {
 
   return {
     success: sheetResult.success && calResult.success,
-    message: sheetResult.message + '\n\n' + calResult.message
+    message: sheetResult.message + '\n\n' + calResult.message,
+    sheetUrl: sheetResult.sheetUrl || null
   };
 }
 

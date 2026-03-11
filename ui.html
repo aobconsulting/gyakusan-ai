@@ -1645,6 +1645,14 @@ function _handleHearingResponse(raw) {
       updateHearingCounter();
     }
 
+    // 上限到達 & 通常質問が返ってきた → 強制でゴール選択フェーズへ
+    if (!data.isGoalSelect && !data.isDone && hearingCount >= maxHearingQuestions) {
+      chatHistory.push({ role: 'user', content: 'GOAL_SELECTED:上限到達' });
+      _showThinking();
+      _callHearing();
+      return;
+    }
+
     var assistantMsg = data.question;
     if (data.isGoalSelect) {
       assistantMsg += '\n' + data.choices.map(function(c){ return c.label + ': ' + c.text; }).join('\n');
@@ -1677,6 +1685,13 @@ function _handleHearingResponse(raw) {
 
   } catch(e) {
     // JSONパース失敗 → フォールバック選択肢を表示（rawをそのまま出さない）
+    // 上限到達中にfallbackが来た場合もゴール選択へ
+    if (hearingCount >= maxHearingQuestions) {
+      chatHistory.push({ role: 'user', content: 'GOAL_SELECTED:上限到達' });
+      _showThinking();
+      _callHearing();
+      return;
+    }
     var fallbackData = {
       question: 'もう少し教えてください。今取り組んでいることで、一番大切なことは何ですか？',
       choices: [

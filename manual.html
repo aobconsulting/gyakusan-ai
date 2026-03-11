@@ -1019,8 +1019,9 @@
                   <span style="color:#475569;">逆算AI v1.0（何でもOK）</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                  <span style="background:#e2e8f0; border-radius:6px; padding:4px 10px; font-size:12px; color:#475569; white-space:nowrap;">実行ユーザー</span>
-                  <span style="background:#dcfce7; border-radius:6px; padding:4px 12px; color:#16a34a; font-weight:600;">自分</span>
+                  <span style="background:#e2e8f0; border-radius:6px; padding:4px 10px; font-size:12px; color:#475569; white-space:nowrap;">次のユーザーとして実行</span>
+                  <span style="background:#fce7f3; border-radius:6px; padding:4px 12px; color:#be185d; font-weight:600;">⚠️ ウェブアプリにアクセスしているユーザー</span>
+                  <span style="color:#94a3b8; font-size:12px;">← ★必ずここを変更</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
                   <span style="background:#e2e8f0; border-radius:6px; padding:4px 10px; font-size:12px; color:#475569; white-space:nowrap;">アクセスできるユーザー</span>
@@ -1035,8 +1036,21 @@
             「デプロイ」後に表示される<strong>ウェブアプリURL</strong>をコピーして保管します。<br>
             このURLをメンバーに共有します（社内チャット・メール等）。
 
-            <div class="step-img-hint">
-              <span>💡</span> <span>コードを変更した場合は「デプロイを管理」→「新しいバージョンを作成」で反映されます</span>
+            <div class="callout callout-warn" style="margin-top:12px;">
+              <span class="callout-icon">⚠️</span>
+              <div>
+                <strong>「次のユーザーとして実行」は必ず「ウェブアプリにアクセスしているユーザー」を選択してください。</strong><br>
+                「自分」のままにすると、全メンバーのGoogleカレンダー登録が管理者のカレンダーに書き込まれてしまいます。<br>
+                正しく設定することで、各メンバーが自分のGoogleカレンダーにスケジュールを登録できます。
+              </div>
+            </div>
+
+            <div class="callout" style="margin-top:8px;">
+              <span class="callout-icon">💡</span>
+              <div>
+                初回アクセス時に各メンバーのGoogle権限許可画面が表示されます。「許可」をクリックすれば以降は表示されません。<br>
+                コードを変更した場合は「デプロイを管理」→「新しいバージョンを作成」で反映されます。
+              </div>
             </div>
           </div>
         </div>
