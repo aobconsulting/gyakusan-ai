@@ -773,7 +773,8 @@ function writeScheduleToSheet(taskInput, trueGoal, goalLevel, goalDateStr, goalT
       '📅 ' + formatDateJP(scheduleData[scheduleData.length - 1].daysBefore === 0 ? goalDate : subtractBusinessDays(goalDate, scheduleData[0].daysBefore)) + 
       ' 〜 ' + formatDateJP(goalDate) + '\n\n' +
       'メニュー「逆算AI」→「Googleカレンダーに書き出し」で\nカレンダーにも登録できます。',
-    eventCount: scheduleData.length
+    eventCount: scheduleData.length,
+    sheetUrl: ss.getUrl() + '#gid=' + sheet.getSheetId()
   };
 }
 
@@ -1005,7 +1006,8 @@ function saveToSheet(params) {
     message: '✅ スプレッドシートに保存しました！\n\n' +
       '📋 ' + items.length + '個のマイルストーン\n' +
       '📄 シート名: ' + sheetName,
-    eventCount: items.length
+    eventCount: items.length,
+    sheetUrl: ss.getUrl() + '#gid=' + sheet.getSheetId()
   };
 }
 
