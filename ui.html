@@ -1593,14 +1593,15 @@ function _removeThinking() {
 function _callHearing(retryCount) {
   retryCount = retryCount || 0;
 
-  // キャッシュがあれば即表示
-  if (_prefetchCache) {
+  // キャッシュがあれば即表示（リトライ時はキャッシュを使わず必ずAPI呼び出し）
+  if (_prefetchCache && retryCount === 0) {
     var cached = _prefetchCache;
     _prefetchCache = null;
     _removeThinking();
     _handleHearingResponse(cached);
     return;
   }
+  _prefetchCache = null; // リトライ時は念のためクリア
 
   // キャッシュなし → API呼び出し
   google.script.run
@@ -1636,8 +1637,6 @@ function _callHearing(retryCount) {
     .continueHearing(chatHistory, taskInput);
 }
 
-var _lastHearingQuestion = '';
-
 function _handleHearingResponse(raw) {
   try {
     var data = JSON.parse(raw);
@@ -1645,15 +1644,6 @@ function _handleHearingResponse(raw) {
       hearingCount++;
       updateHearingCounter();
     }
-
-    // 同じ質問が2回連続したらゴール選択フェーズに強制移行
-    if (!data.isGoalSelect && !data.isDone && data.question === _lastHearingQuestion) {
-      chatHistory.push({ role: 'user', content: 'GOAL_SELECTED:強制移行' });
-      _showThinking();
-      _callHearing();
-      return;
-    }
-    _lastHearingQuestion = data.question;
 
     var assistantMsg = data.question;
     if (data.isGoalSelect) {
@@ -1825,6 +1815,9 @@ function _showCoffeeBreak(waitSec, retryIndex, onDone) {
   // 前のコーヒーブレイクがあれば除去
   var old = document.getElementById('coffeeBreakMsg');
   if (old) old.remove();
+  // プリフェッチを完全停止・クリア（古いキャッシュでリトライが汚染されないよう）
+  if (_prefetchTimer) { clearTimeout(_prefetchTimer); _prefetchTimer = null; }
+  _prefetchCache = null;
 
   var scenes = [
     { char: '🤖', anim: 'sitting',  cup: '☕', label: 'AIがコーヒーブレイク中...', desk: '' },
@@ -2321,7 +2314,6 @@ function resetAll() {
   hearingCount = 0;
   _prefetchCache = null;
   _choiceSelected = false;
-  _lastHearingQuestion = '';
   updateHearingCounter();
   document.getElementById('taskInput').value = '';
   document.getElementById('chatMessages').innerHTML = '';
