@@ -291,11 +291,11 @@
   .chat-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 160px);
+    min-height: calc(100vh - 220px);
   }
   .chat-messages {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: visible;
     padding-bottom: 10px;
   }
   .msg {
@@ -1622,8 +1622,12 @@ function _callHearing(retryCount) {
       _handleHearingResponse(raw);
     })
     .withFailureHandler(function(err) {
-      if (retryCount < 2) {
-        setTimeout(function() { _callHearing(retryCount + 1); }, 8000);
+      if (retryCount < 4) {
+        var waitSec = [12, 25, 40, 60][retryCount];
+        _removeThinking();
+        _showCoffeeBreak(waitSec, retryCount, function() {
+          _callHearing(retryCount + 1);
+        });
       } else {
         _removeThinking();
         _showChoiceError();
@@ -1861,7 +1865,10 @@ function _showCoffeeBreak(waitSec, retryIndex, onDone) {
     '</div>';
 
   container.appendChild(wrap);
-  container.scrollTop = container.scrollHeight;
+  // コーヒーブレイクが見えるようにページスクロール
+  setTimeout(function() {
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 100);
 
   // プログレスバー & カウントダウン
   var elapsed = 0;
