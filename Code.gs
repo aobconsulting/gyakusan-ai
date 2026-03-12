@@ -26,6 +26,24 @@ function onOpen() {
     .addToUi();
 }
 
+// ── JSON抽出ヘルパー ──
+// Geminiが前後に説明文を付けた場合でも { } の中身を確実に取り出す
+function extractJson(raw) {
+  if (!raw) return '{}';
+  // ```json ... ``` ブロックを優先
+  var block = raw.match(/```json\s*([\s\S]*?)```/);
+  if (block) return block[1].trim();
+  // ``` ... ``` ブロック
+  var block2 = raw.match(/```([\s\S]*?)```/);
+  if (block2) return block2[1].trim();
+  // { ... } を最初から最後まで抽出
+  var start = raw.indexOf('{');
+  var end   = raw.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) return raw.slice(start, end + 1);
+  return raw.trim();
+}
+
+
 // ── ログイン中ユーザーのカレンダーを取得 ──
 // プライマリカレンダーID = ログイン中メールアドレス
 // デプロイ設定「ユーザーとして実行」が必要
@@ -358,23 +376,14 @@ function continueHearing(chatHistory, taskInput) {
   // ⚠️ レート制限エラーをそのまま返す（JS側でハンドリング）
   if (raw.indexOf('⚠️') === 0) return raw;
 
-  // JSON抽出（```json ブロック対応）
-  var json = raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+  // JSON抽出（前後の説明文・コードブロックを除去して確実に抽出）
+  var json = extractJson(raw);
   try {
-    JSON.parse(json); // 検証
+    JSON.parse(json);
     return json;
   } catch(e) {
-    // パース失敗時はフォールバック
-    return JSON.stringify({
-      question: 'もう少し教えてください。どんなことを実現したいですか？',
-      choices: [
-        {label:'A', text:'事業・仕事の成果を出したい'},
-        {label:'B', text:'自分自身が成長したい'},
-        {label:'C', text:'周囲や社会に貢献したい'},
-        {label:'D', text:'その他（自由記述）'}
-      ],
-      isGoalSelect: false
-    });
+    // パース失敗時はフォールバック（⚠️マーカーつきでJS側に通知）
+    return '⚠️FALLBACK';
   }
 }
 
@@ -401,7 +410,7 @@ function continueHearingConfirm(chatHistory, taskInput) {
 
   if (raw.indexOf('⚠️') === 0) return raw;
 
-  var json = raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+  var json = extractJson(raw);
   try {
     JSON.parse(json);
     return json;
