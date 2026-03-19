@@ -375,14 +375,33 @@
   .skip-btn:hover { border-color: var(--primary); color: var(--primary); }
 
   .hearing-counter {
-    text-align: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-dim);
-    padding: 6px 0 10px;
-    letter-spacing: 0.3px;
+    padding: 6px 16px 12px;
   }
-  .hearing-counter span { font-weight: 700; color: var(--primary); }
+  .hearing-progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+  }
+  .hearing-progress-label .progress-status {
+    font-weight: 600;
+    color: var(--primary);
+  }
+  .hearing-progress-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .hearing-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #60a5fa);
+    border-radius: 99px;
+    transition: width 0.6s ease;
+    width: 0%;
+  }
 
   /* ── Goal Badge ── */
   .goal-badge {
@@ -1309,7 +1328,15 @@
 <div class="content hidden" id="step1">
   <div class="chat-container">
     <div class="chat-messages" id="chatMessages"></div>
-    <div id="hearingCounter" class="hearing-counter">あと <span id="hearingRemain">5</span> 問で完了</div>
+    <div id="hearingCounter" class="hearing-counter">
+      <div class="hearing-progress-label">
+        <span>ゴールを探っています</span>
+        <span class="progress-status" id="hearingStatus"></span>
+      </div>
+      <div class="hearing-progress-track">
+        <div class="hearing-progress-fill" id="hearingProgressFill"></div>
+      </div>
+    </div>
     <div class="chat-input-area hidden" id="chatInputArea">
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chatInput" placeholder="回答を入力..." onkeydown="if(event.key==='Enter')sendMessage()">
@@ -1458,7 +1485,7 @@ var _goalLevelSelected = false;  // ゴール視点を選択済みか
 var _prefetchCache = null;   // 先読みキャッシュ
 var _prefetchTimer = null;   // 先読みタイマー
 var _choiceSelected = false; // 連打防止
-var maxHearingQuestions = 5;
+var maxHearingQuestions = 5; // 安全網：無限ループ防止の上限
 
 // ── Sample Data ──
 var bizSamples = [
@@ -1551,7 +1578,7 @@ function startHearing() {
   addChatMessage('user', taskInput, true);
 
   // テンプレート応答（API不要・即座に表示）
-  var reply = '「' + taskInput + '」ですね！\nゴールの解像度を上げるためにいくつか質問させてください。よろしいですか？';
+  var reply = '「' + taskInput + '」ですね！\nゴールの解像度を上げるためにいくつか質問（最大5問）させてください。よろしいですか？';
   chatHistory = [
     { role: 'user', content: 'やるべきタスク：「' + taskInput + '」' },
     { role: 'assistant', content: reply }
@@ -1647,12 +1674,8 @@ function _callHearing(retryCount) {
 function _handleHearingResponse(raw) {
   try {
     var data = JSON.parse(raw);
-    if (!data.isGoalSelect && !data.isDone) {
-      hearingCount++;
-      updateHearingCounter();
-    }
 
-    // ゴール選択済みなのに再度isGoalSelectが来たら強制確定
+    // ── ゴール選択済みに再度isGoalSelectが来たら強制確定 ──
     if (data.isGoalSelect && _goalLevelSelected) {
       trueGoal = data.goalText || taskInput;
       goalLevel = data.goalLevel || '2';
@@ -1664,22 +1687,29 @@ function _handleHearingResponse(raw) {
       return;
     }
 
-    // 上限到達 & 通常質問が返ってきた → AIにゴール視点提示を要求
+    // ── 通常質問のカウント ──
+    if (!data.isGoalSelect && !data.isDone) {
+      hearingCount++;
+      updateHearingCounter();
+    }
+
+    // ── 安全網: 上限到達で通常質問が返ってきたらゴール選択を要求 ──
     if (!data.isGoalSelect && !data.isDone && hearingCount >= maxHearingQuestions) {
-      chatHistory.push({ role: 'user', content: '（ヒアリング完了。今すぐゴール視点の選択肢4つを提示してください）' });
+      chatHistory.push({ role: 'user', content: '（十分な情報が集まりました。今すぐゴール視点の選択肢4つを提示してください）' });
       _showThinking();
       _callHearing();
       return;
     }
 
+    // ── chatHistoryに追加 ──
     var assistantMsg = data.question;
     if (data.isGoalSelect) {
       assistantMsg += '\n' + data.choices.map(function(c){ return c.label + ': ' + c.text; }).join('\n');
     }
     chatHistory.push({ role: 'assistant', content: assistantMsg });
 
+    // ── isDone: ゴール確定 ──
     if (data.isDone) {
-      // ゴール確定
       trueGoal = data.goalText || taskInput;
       goalLevel = data.goalLevel || '1';
       bizType = data.bizType || '';
@@ -1690,27 +1720,27 @@ function _handleHearingResponse(raw) {
       return;
     }
 
+    // ── 選択肢を描画 ──
     _renderChoices(data);
+    if (data.isGoalSelect) _showGoalSelectCounter();
 
-    // 先読み: isGoalSelect でない かつ 残り回数がある場合のみ
-    var remain = maxHearingQuestions - hearingCount;
-    if (!data.isGoalSelect && remain > 0) {
+    // ── 先読み: 通常質問のみ ──
+    if (!data.isGoalSelect) {
       _prefetchCache = null;
       if (_prefetchTimer) clearTimeout(_prefetchTimer);
-      _prefetchTimer = setTimeout(function() {
-        _prefetchNext();
-      }, 1200);
+      _prefetchTimer = setTimeout(function() { _prefetchNext(); }, 1200);
     }
 
   } catch(e) {
-    // JSONパース失敗 → フォールバック選択肢を表示（rawをそのまま出さない）
-    // 上限到達中にfallbackが来た場合もゴール視点提示を要求
+    // JSONパース失敗 → 上限到達ならゴール選択要求、そうでなければfallback
     if (hearingCount >= maxHearingQuestions) {
-      chatHistory.push({ role: 'user', content: '（ヒアリング完了。今すぐゴール視点の選択肢4つを提示してください）' });
+      chatHistory.push({ role: 'user', content: '（十分な情報が集まりました。今すぐゴール視点の選択肢4つを提示してください）' });
       _showThinking();
       _callHearing();
       return;
     }
+    hearingCount++;
+    updateHearingCounter();
     var fallbackData = {
       question: 'もう少し教えてください。今取り組んでいることで、一番大切なことは何ですか？',
       choices: [
@@ -1721,8 +1751,6 @@ function _handleHearingResponse(raw) {
       ],
       isGoalSelect: false
     };
-    hearingCount++;
-    updateHearingCounter();
     chatHistory.push({ role: 'assistant', content: fallbackData.question });
     _renderChoices(fallbackData);
   }
@@ -1801,6 +1829,13 @@ function _onChoiceClick(btn) {
       var field = area.querySelector('.other-input-field');
       if (field) field.focus();
     }
+    return;
+  }
+
+  // 「質問なしでスケジュール作成へ」はスキップ扱い
+  if (text === '質問なしでスケジュール作成へ') {
+    addChatMessage('user', text);
+    skipToDate();
     return;
   }
 
@@ -1987,19 +2022,21 @@ function retryHearing() {
 }
 
 function updateHearingCounter() {
-  var remain = Math.max(0, maxHearingQuestions - hearingCount);
-  var el = document.getElementById('hearingRemain');
-  if (el) el.textContent = remain;
-  var counter = document.getElementById('hearingCounter');
-  if (!counter) return;
-  if (remain <= 0) {
-    counter.textContent = 'ゴールを選択してください';
-    counter.style.color = 'var(--primary)';
-    counter.style.fontWeight = '700';
-  } else {
-    counter.style.color = remain <= 1 ? '#EF4444' : 'var(--text-dim)';
-    counter.style.fontWeight = '600';
-  }
+  // 5問上限ベースで進捗を計算（最大90%まで。100%はゴール選択時）
+  var pct = Math.min(90, Math.round(hearingCount / maxHearingQuestions * 100));
+  var fill = document.getElementById('hearingProgressFill');
+  var status = document.getElementById('hearingStatus');
+  if (fill) fill.style.width = pct + '%';
+  if (status) status.textContent = hearingCount + '問目';
+}
+
+function _showGoalSelectCounter() {
+  var fill = document.getElementById('hearingProgressFill');
+  var status = document.getElementById('hearingStatus');
+  var label = document.querySelector('.hearing-progress-label span:first-child');
+  if (fill) fill.style.width = '100%';
+  if (status) { status.textContent = '完了'; status.style.color = '#22c55e'; }
+  if (label) label.textContent = 'ゴールを選択してください';
 }
 
 function checkGoalConfirmed(reply) {
@@ -2348,6 +2385,12 @@ function resetAll() {
   schedulePreviewData = [];
   hearingCount = 0;
   _prefetchCache = null;
+  var _resetFill = document.getElementById('hearingProgressFill');
+  if (_resetFill) _resetFill.style.width = '0%';
+  var _resetStatus = document.getElementById('hearingStatus');
+  if (_resetStatus) { _resetStatus.textContent = ''; _resetStatus.style.color = ''; }
+  var _resetLabel = document.querySelector('.hearing-progress-label span:first-child');
+  if (_resetLabel) _resetLabel.textContent = 'ゴールを探っています';
   _choiceSelected = false;
   updateHearingCounter();
   document.getElementById('taskInput').value = '';

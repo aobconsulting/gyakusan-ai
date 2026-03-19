@@ -1226,12 +1226,13 @@
         <div class="flow-content">
           <h3>AIとの対話で本当のゴールを見つける</h3>
           <p>
-            AIが選択肢（A/B/C）を提示します。タップするだけでOK。<br>
+            AIが選択肢（A/B/C/D）を提示します。タップするだけでOK。<br>
             「その他」を選んだときだけ自由記述ができます。<br>
-            最短<strong>3回のやりとり</strong>で、あなた自身も気づいていなかった本質的なゴールが<br>
-            <strong>4つの視点</strong>の選択肢として可視化され、最もしっくりくるものを選べます。
+            AIが<strong>最大5問</strong>の質問で情報を引き出し、十分な情報が集まった時点で<br>
+            <strong>4つのゴール視点</strong>の選択肢が提示されます。最もしっくりくるものを選べます。<br>
+            画面上のプログレスバーで現在の進捗（何問目か）を確認できます。
           </p>
-          <span class="tag tag-new">✨ NEW: 選択肢タップ方式・最短3回で完了</span>
+          <span class="tag tag-new">✨ NEW: 選択肢タップ方式・プログレスバー付きヒアリング</span>
         </div>
       </div>
 
@@ -1426,12 +1427,28 @@
 
     <div class="faq-item" onclick="this.classList.toggle('open')">
       <div class="faq-item">
-      <div class="faq-q">対話中に画面が止まることはありますか？</div>
+      <div class="faq-q">対話中に「AIがコーヒーブレイク中...」と表示されます</div>
       <div class="faq-a">
-        AIサーバーが混み合っているとき、🤖がコーヒーブレイクするアニメーションが表示されます。
-        プログレスバーのカウントダウンが終わると<strong>自動で再送信</strong>されるので、
-        何もしなくて大丈夫です。エラーメッセージは表示されません。
-        万が一4回リトライしても解消しない場合のみ、スキップボタンが表示されます。
+        <strong>これは逆算AIのバグではありません。</strong> Googleが提供するGemini API（AI機能の実体）が一時的に混雑している状態です。<br><br>
+        逆算AIはGemini APIの<strong>無料枠</strong>を使用しており、以下の利用制限があります：<br>
+        <table style="margin:8px 0;border-collapse:collapse;font-size:13px;">
+          <tr><th style="border:1px solid var(--border);padding:4px 12px;background:var(--bg);">制限</th><th style="border:1px solid var(--border);padding:4px 12px;background:var(--bg);">上限</th></tr>
+          <tr><td style="border:1px solid var(--border);padding:4px 12px;">1分あたりのリクエスト数</td><td style="border:1px solid var(--border);padding:4px 12px;">10回/分</td></tr>
+          <tr><td style="border:1px solid var(--border);padding:4px 12px;">1日あたりのリクエスト数</td><td style="border:1px solid var(--border);padding:4px 12px;">500回/日</td></tr>
+        </table>
+        プログレスバーのカウントダウンが終わると<strong>自動で再送信</strong>されます（最大4回）。何もしなくて大丈夫です。<br>
+        それでも解消しない場合は「もう一度試す」ボタンを押すか、1〜2分待ってから再試行してください。<br>
+        <strong>1日の上限に達した場合は翌日にリセットされます。</strong><br><br>
+
+        <strong>ビジー状態が頻繁に起きる場合は有料プランへの移行を検討してください。</strong><br>
+        <a href="https://aistudio.google.com/" target="_blank" style="color:var(--primary);">Google AI Studio</a> →「請求を設定」でGoogle Cloudプロジェクトに課金を有効にすると、従量課金制（Pay-as-you-go）に移行できます。<br><br>
+        <table style="margin:8px 0;border-collapse:collapse;font-size:13px;width:100%;">
+          <tr><th style="border:1px solid var(--border);padding:6px 12px;background:var(--bg);text-align:left;">項目</th><th style="border:1px solid var(--border);padding:6px 12px;background:var(--bg);text-align:left;">無料枠</th><th style="border:1px solid var(--border);padding:6px 12px;background:var(--bg);text-align:left;">有料（従量課金）</th></tr>
+          <tr><td style="border:1px solid var(--border);padding:6px 12px;">リクエスト制限</td><td style="border:1px solid var(--border);padding:6px 12px;">10回/分・500回/日</td><td style="border:1px solid var(--border);padding:6px 12px;">大幅に緩和</td></tr>
+          <tr><td style="border:1px solid var(--border);padding:6px 12px;">データの学習利用</td><td style="border:1px solid var(--border);padding:6px 12px;">あり（Googleが活用）</td><td style="border:1px solid var(--border);padding:6px 12px;">なし（プライバシー保護）</td></tr>
+          <tr><td style="border:1px solid var(--border);padding:6px 12px;">料金目安（Gemini 2.5 Flash）</td><td style="border:1px solid var(--border);padding:6px 12px;">無料</td><td style="border:1px solid var(--border);padding:6px 12px;">1セッション約$0.01〜0.03</td></tr>
+        </table>
+        最新の料金は <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" style="color:var(--primary);">Gemini API 料金ページ（公式）</a> をご確認ください。
       </div>
     </div>
     <div class="faq-q">APIキーのエラーが出ます</div>

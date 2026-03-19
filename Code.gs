@@ -299,7 +299,7 @@ function startGoalHearing(taskInput) {
     '※ 5軸すべてを聞く必要はない。会話の中で支配軸と差別化軸が自然に特定できればOK。\n\n' +
 
     '■ 会話のルール（厳守）\n' +
-    '1. 最初の返答では、タスクを受け止めた上で「ゴールの解像度を上げるためにいくつか質問させてください。よろしいですか？」と確認する。それ以外の質問はまだしない。\n' +
+    '1. 最初の返答では、タスクを受け止めた上で「ゴールの解像度を上げるためにいくつか質問（最大5問）させてください。よろしいですか？」と確認する。それ以外の質問はまだしない。\n' +
     '2. ユーザーがOKしたら、質問を開始する。\n' +
     '3. ★★★ 質問は必ず1つだけ。絶対に2つ以上の質問を同時にしない。1回の返答に「？」は1つだけ。 ★★★\n' +
     '4. 回答を元に、さらに「その先にある目的」を引き出す（1問ずつ）\n' +
@@ -339,6 +339,18 @@ function continueHearing(chatHistory, taskInput) {
   }
   if (lastUser.indexOf('GOAL_SELECTED:') === 0) {
     return continueHearingConfirm(chatHistory, taskInput);
+  }
+
+  // 1ターン目：固定の挨拶文を返す（AIに任せると文言がブレるため）
+  if (userTurns === 1) {
+    return JSON.stringify({
+      question: '「' + taskInput + '」ですね！\nゴールの解像度を上げるためにいくつか質問（最大5問）させてください。よろしいですか？',
+      choices: [
+        {label:'A', text:'はい、お願いします'},
+        {label:'B', text:'質問なしでスケジュール作成へ'}
+      ],
+      isGoalSelect: false
+    });
   }
 
   var systemPrompt =
