@@ -857,6 +857,60 @@
           </div>
         </div>
 
+        <div class="step">
+          <div class="step-title">（オプション）スマートフォンやブラウザから直接使う場合 📱</div>
+          <div class="step-body">
+            スプレッドシートを開かずにブラウザから直接アクセスしたい場合は、ウェブアプリとしてデプロイします。<br><br>
+            Apps Script エディタで <strong>「デプロイ」→「新しいデプロイ」</strong> をクリック。<br><br>
+
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;">
+              <div style="background:#1e293b; color:#e2e8f0; padding:10px 16px; font-size:13px; font-weight:600; border-radius:8px 8px 0 0; margin:-20px -20px 16px;">
+                🖥️ 個人Gmail用デプロイ設定
+              </div>
+              <div style="font-size:14px; line-height:2.4;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                  <span style="background:#e2e8f0; border-radius:6px; padding:4px 10px; font-size:12px; color:#475569; white-space:nowrap;">種類</span>
+                  <span style="background:#dbeafe; border-radius:6px; padding:4px 12px; color:#1d4ed8; font-weight:600;">⚙️ ウェブアプリ</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                  <span style="background:#e2e8f0; border-radius:6px; padding:4px 10px; font-size:12px; color:#475569; white-space:nowrap;">次のユーザーとして実行</span>
+                  <span style="background:#dcfce7; border-radius:6px; padding:4px 12px; color:#16a34a; font-weight:600;">自分</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                  <span style="background:#e2e8f0; border-radius:6px; padding:4px 10px; font-size:12px; color:#475569; white-space:nowrap;">アクセスできるユーザー</span>
+                  <span style="background:#fef9c3; border-radius:6px; padding:4px 12px; color:#854d0e; font-weight:600;">全員</span>
+                  <span style="color:#94a3b8; font-size:12px;">← 個人Gmailはこちらを選択</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="callout callout-warn">
+              <span class="callout-icon">⚠️</span>
+              <div>
+                個人Gmail（@gmail.com）では「同じドメイン内全員」を選ぶとエラーになります。<br>
+                必ず<strong>「全員」</strong>を選択してください。
+              </div>
+            </div>
+
+            デプロイ後に表示される <strong>ウェブアプリURL（末尾が /exec）</strong> をブックマークすれば、どのデバイスからでもアクセスできます。
+
+            <div class="callout callout-warn" style="margin-top:16px;">
+              <span class="callout-icon">⚠️</span>
+              <div>
+                <strong>複数のGoogleアカウントを使っている場合（よくあるトラブル）</strong><br><br>
+                WorkspaceアカウントとGmailアカウントを同時にChromeにログインしていると、
+                ウェブアプリURLを開こうとしたときに<strong>「現在、ファイルを開くことができません。」</strong>というGoogleドライブのエラーが表示されることがあります。<br><br>
+                <strong>解決方法①（推奨）：シークレットウィンドウを使う</strong><br>
+                Ctrl+Shift+N（Mac: ⌘+Shift+N）でシークレットウィンドウを開き、個人Gmailだけでログインしてアクセスする。<br><br>
+                <strong>解決方法②：URLに authuser パラメータを付ける</strong><br>
+                URLの末尾に <code>?authuser=1</code> または <code>?authuser=2</code> を付けてアクセスする（数字はログイン順によって異なる）。<br><br>
+                <strong>解決方法③（恒久対策）：Chromeプロファイルを分ける</strong><br>
+                Chrome右上のアイコン →「プロフィールを追加」で個人Gmail専用のChromeプロファイルを作成する。以降はそのプロファイルでアクセスすれば毎回シークレットウィンドウを使う必要がなくなる。
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div><!-- /steps-personal -->
 
@@ -1449,6 +1503,18 @@
           <tr><td style="border:1px solid var(--border);padding:6px 12px;">料金目安（Gemini 2.5 Flash）</td><td style="border:1px solid var(--border);padding:6px 12px;">無料</td><td style="border:1px solid var(--border);padding:6px 12px;">1セッション約$0.01〜0.03</td></tr>
         </table>
         最新の料金は <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" style="color:var(--primary);">Gemini API 料金ページ（公式）</a> をご確認ください。
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">「現在、ファイルを開くことができません。」というエラーが出ます</div>
+      <div class="faq-a">
+        WorkspaceアカウントとGmailアカウントを同時にChromeにログインしているときに起きやすいエラーです。以下の方法で解決できます。<br><br>
+        <strong>① シークレットウィンドウで開く（すぐ試せる）</strong><br>
+        Ctrl+Shift+N でシークレットウィンドウを開き、個人Gmailだけでログインしてアクセス。<br><br>
+        <strong>② URLに ?authuser=N を付ける</strong><br>
+        ウェブアプリURLの末尾に <code>?authuser=1</code> や <code>?authuser=2</code> を付けて試す。<br><br>
+        <strong>③ Chromeプロファイルを分ける（恒久対策）</strong><br>
+        Chrome右上のアイコン →「プロフィールを追加」で個人Gmail専用プロファイルを作成する。
       </div>
     </div>
     <div class="faq-q">APIキーのエラーが出ます</div>
